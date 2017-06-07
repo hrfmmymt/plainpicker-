@@ -1,0 +1,25 @@
+{
+  "name": "plainpicker-",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "css": "node-sass --source-map true --output-style expanded ./src/styles/app.scss ./public/styles/app.css",
+    "w-css": "node-sass -w --source-map true --output-style expanded ./src/styles/app.scss ./public/styles/app.css",
+    "lint-js": "eslint *.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-sass": "^4.5.3"
+  },
+  "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.3.0",
+    "eslint-plugin-node": "^5.0.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1"
+  }
+}

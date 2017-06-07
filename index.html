@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>plainpicker</title>
+    <link rel="stylesheet" href="public/styles/app.css">
+  </head>
+  <body>
+  <input type="text" id="datepicker-2months">
+    <script src="app.js"></script>
+    <script>
+    var picker2months = new Pikaday({
+      numberOfMonths: 2,
+      field: document.getElementById('datepicker-2months'),
+      firstDay: 1,
+      minDate: new Date(),
+      // maxDate: new Date(2020, 12, 31),
+      // yearRange: [2000, 2020],
+      onSelect: function(date) { // 'YYYY/MM/DD'
+        var year = date.getFullYear(),
+            month = date.getMonth() + 1,
+            day = date.getDate(),
+            formattedDate = [
+              year,
+              month < 10 ? '0' + month : month,
+              day < 10 ? '0' + day : day
+            ].join('/')
+        document.getElementById('datepicker-2months').value = formattedDate
+      },
+    });
+    </script>
+  </body>
+</html>
