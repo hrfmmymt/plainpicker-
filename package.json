@@ -4,22 +4,34 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "css": "node-sass --source-map true --output-style expanded ./src/styles/app.scss ./public/styles/app.css",
-    "w-css": "node-sass -w --source-map true --output-style expanded ./src/styles/app.scss ./public/styles/app.css",
-    "lint-js": "eslint *.js"
+    "js": "rollup -c",
+    "watch-js": "rollup -c -w",
+    "lint-js": "eslint *.js",
+    "css": "postcss -c postcss.config.js -o public/css/app.css src/css/app.css",
+    "watch-css": "postcss -c postcss.config.js -o public/css/app.css src/css/app.css -w --map",
+    "lint-css": "stylelint -c .stylelintrc 'src/**/*.css'",
+    "serve": "browser-sync start --server --files './index.html, public/css/*.css, public/js/*.js' --config bs-config.js",
+    "watch": "npm run serve & npm run watch-js & npm run watch-css",
+    "build": "npm run css && npm run js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "node-sass": "^4.5.3"
-  },
   "devDependencies": {
+    "autoprefixer": "^7.1.1",
+    "browser-sync": "^2.18.12",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-node": "^5.0.0",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint-plugin-standard": "^3.0.1",
+    "postcss": "^6.0.1",
+    "postcss-cli": "^4.0.0",
+    "postcss-nested": "^2.0.2",
+    "rollup": "^0.42.0",
+    "rollup-watch": "^4.0.0",
+    "stylelint": "^7.10.1",
+    "stylelint-config-standard": "^16.0.0"
   }
 }

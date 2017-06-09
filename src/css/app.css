@@ -34,7 +34,7 @@
 
 .datepicker__lendar {
   float: left;
-  width: 240px;
+  width: 320px;
   margin: 8px;
 }
 
@@ -154,7 +154,8 @@
   border: 0;
   margin: 0;
   width: 100%;
-  padding: 5px;
+  // padding: 5px;
+  padding: 14px;
   color: #666;
   font-size: 12px;
   line-height: 15px;

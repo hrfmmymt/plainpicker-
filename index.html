@@ -3,19 +3,32 @@
   <head>
     <meta charset="utf-8">
     <title>plainpicker</title>
-    <link rel="stylesheet" href="public/styles/app.css">
+    <link rel="stylesheet" href="public/css/app.css">
   </head>
   <body>
-  <input type="text" id="datepicker-2months">
-    <script src="app.js"></script>
+    <input type="text" id="plainPicker" class="plainPicker">
+    <input type="text" class="plainPicker">
+    <script src="public/js/bundle.js"></script>
     <script>
-    var picker2months = new Pikaday({
+    var now = new Date()
+    var currentYear = now.getFullYear()
+    var nextYear = currentYear +1
+    var nextYearDate = new Date(nextYear, now.getMonth() +1, now.getDate())
+    var plainPicker = new PlainPicker({
       numberOfMonths: 2,
-      field: document.getElementById('datepicker-2months'),
+      field: document.getElementById('plainPicker'),
+      trigger: document.getElementsByClassName('plainPicker'),
       firstDay: 1,
-      minDate: new Date(),
-      // maxDate: new Date(2020, 12, 31),
-      // yearRange: [2000, 2020],
+      minDate: now,
+      maxDate: new Date(nextYearDate),
+      yearRange: [currentYear, nextYear],
+      i18n: {
+        // previousMonth : '前月',
+        // nextMonth     : '次月',
+        months        : ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        weekdays      : ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'],
+        weekdaysShort : ['日', '月', '火', '水', '木', '金', '土']
+      },
       onSelect: function(date) { // 'YYYY/MM/DD'
         var year = date.getFullYear(),
             month = date.getMonth() + 1,
@@ -25,9 +38,9 @@
               month < 10 ? '0' + month : month,
               day < 10 ? '0' + day : day
             ].join('/')
-        document.getElementById('datepicker-2months').value = formattedDate
+        document.getElementById('plainPicker').value = formattedDate
       },
-    });
+    })
     </script>
   </body>
 </html>
