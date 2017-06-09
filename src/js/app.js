@@ -2,64 +2,66 @@
   /**
    * feature detection and helper functions
    */
-  var document = window.document
-  var addEvent = function (el, e, callback, capture) {
+  const document = window.document
+  const addEvent = (el, e, callback, capture) => {
     el.addEventListener(e, callback, !!capture)
   }
 
-  var removeEvent = function (el, e, callback, capture) {
+  const removeEvent = (el, e, callback, capture) => {
     el.removeEventListener(e, callback, !!capture)
   }
 
-  var trim = function (str) {
+  const trim = str => {
     return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '')
   }
 
-  var hasClass = function (el, cn) {
+  const hasClass = (el, cn) => {
     return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
   }
 
-  var addClass = function (el, cn) {
+  const addClass = (el, cn) => {
     if (!hasClass(el, cn)) {
       el.className = (el.className === '') ? cn : el.className + ' ' + cn
     }
   }
 
-  var removeClass = function (el, cn) {
+  const removeClass = (el, cn) => {
     el.className = trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '))
   }
 
-  var isArray = function (obj) {
+  const isArray = obj => {
     return (/Array/).test(Object.prototype.toString.call(obj))
   }
 
-  var isDate = function (obj) {
+  const isDate = obj => {
     return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
   }
 
-  var isWeekend = function (date) {
-    var day = date.getDay()
+  const isWeekend = date => {
+    const day = date.getDay()
     return day === 0 || day === 6
   }
 
-  var isLeapYear = function (year) {
+  const isLeapYear = year => {
     return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
   }
 
-  var getDaysInMonth = function (year, month) {
+  const getDaysInMonth = (year, month) => {
     return [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
   }
 
-  var setToStartOfDay = function (date) {
+  const setToStartOfDay = date => {
     if (isDate(date)) date.setHours(0, 0, 0, 0)
   }
 
-  var compareDates = function (a, b) {
+  const compareDates = (a, b) => {
     return a.getTime() === b.getTime()
   }
 
-  var extend = function (to, from, overwrite) {
-    var prop, hasProp
+  const extend = (to, from, overwrite) => {
+    let prop
+    let hasProp
+
     for (prop in from) {
       hasProp = to[prop] !== undefined
       if (hasProp && typeof from[prop] === 'object' && from[prop] !== null && from[prop].nodeName === undefined) {
@@ -81,8 +83,8 @@
     return to
   }
 
-  var fireEvent = function (el, eventName, data) {
-    var ev
+  const fireEvent = (el, eventName, data) => {
+    let ev
 
     if (document.createEvent) {
       ev = document.createEvent('HTMLEvents')
@@ -96,7 +98,7 @@
     }
   }
 
-  var adjustCalendar = function (calendar) {
+  const adjustCalendar = calendar => {
     if (calendar.month < 0) {
       calendar.year -= Math.ceil(Math.abs(calendar.month) / 12)
       calendar.month += 12
@@ -111,7 +113,7 @@
   /**
    * defaults and localisation
    */
-  var defaults = {
+  const defaults = {
 
     // bind the picker to a form field
     field: null,
@@ -225,7 +227,7 @@
   /**
    * templating functions to abstract HTML rendering
    */
-  var renderDayName = function (opts, day, abbr) {
+  const renderDayName = (opts, day, abbr) => {
     day += opts.firstDay
     while (day >= 7) {
       day -= 7
@@ -233,9 +235,9 @@
     return abbr ? opts.i18n.weekdaysShort[day] : opts.i18n.weekdays[day]
   }
 
-  var renderDay = function (opts) {
-    var arr = []
-    var ariaSelected = 'false'
+  const renderDay = opts => {
+    let arr = []
+    let ariaSelected = 'false'
     if (opts.isEmpty) {
       if (opts.showDaysInNextAndPreviousMonths) {
         arr.push('is-outside-current-month')
@@ -277,23 +279,23 @@
         '</td>'
   }
 
-  var renderWeek = function (d, m, y) {
-    var onejan = new Date(y, 0, 1)
-    var weekNum = Math.ceil((((new Date(y, m, d) - onejan) / 86400000) + onejan.getDay() + 1) / 7)
+  const renderWeek = (d, m, y) => {
+    const onejan = new Date(y, 0, 1)
+    const weekNum = Math.ceil((((new Date(y, m, d) - onejan) / 86400000) + onejan.getDay() + 1) / 7)
     return '<td class="datepicker__week">' + weekNum + '</td>'
   }
 
-  var renderRow = function (days, isRTL, pickWholeWeek, isRowSelected) {
+  const renderRow = (days, isRTL, pickWholeWeek, isRowSelected) => {
     return '<tr class="datepicker__row' + (pickWholeWeek ? ' pick-whole-week' : '') + (isRowSelected ? ' is-selected' : '') + '">' + (isRTL ? days.reverse() : days).join('') + '</tr>'
   }
 
-  var renderBody = function (rows) {
+  const renderBody = rows => {
     return '<tbody>' + rows.join('') + '</tbody>'
   }
 
-  var renderHead = function (opts) {
-    var i
-    var arr = []
+  const renderHead = opts => {
+    let i
+    let arr = []
     if (opts.showWeekNumber) {
       arr.push('<th></th>')
     }
@@ -303,18 +305,17 @@
     return '<thead><tr>' + (opts.isRTL ? arr.reverse() : arr).join('') + '</tr></thead>'
   }
 
-  var renderTitle = function (instance, c, year, month, refYear, randId) {
-    var i
-    var j
-    var arr
-    var opts = instance._o
-    var isMinYear = year === opts.minYear
-    var isMaxYear = year === opts.maxYear
-    var html = '<div id="' + randId + '" class="datepicker__title" role="heading" aria-live="assertive">'
-    var monthHtml
-    var yearHtml
-    var prev = true
-    var next = true
+  const renderTitle = (instance, c, year, month, refYear, randId) => {
+    let i
+    let j
+    let arr
+    const opts = instance._o
+    const isMinYear = year === opts.minYear
+    const isMaxYear = year === opts.maxYear
+    let html = '<div id="' + randId + '" class="datepicker__title" role="heading" aria-live="assertive">'
+
+    let prev = true
+    let next = true
 
     for (arr = [], i = 0; i < 12; i++) {
       arr.push('<option value="' + (year === refYear ? i - c : 12 + i - c) + '"' +
@@ -323,7 +324,7 @@
           opts.i18n.months[i] + '</option>')
     }
 
-    monthHtml = '<div class="datepicker__label">' + opts.i18n.months[month] + '<select class="datepicker__select datepicker__select-month" tabindex="-1">' + arr.join('') + '</select></div>'
+    const monthHtml = '<div class="datepicker__label">' + opts.i18n.months[month] + '<select class="datepicker__select datepicker__select-month" tabindex="-1">' + arr.join('') + '</select></div>'
 
     if (isArray(opts.yearRange)) {
       i = opts.yearRange[0]
@@ -338,7 +339,7 @@
         arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"' : '') + '>' + (i) + '</option>')
       }
     }
-    yearHtml = '<div class="datepicker__label">' + year + opts.yearSuffix + '<select class="datepicker__select datepicker__select-year" tabindex="-1">' + arr.join('') + '</select></div>'
+    const yearHtml = '<div class="datepicker__label">' + year + opts.yearSuffix + '<select class="datepicker__select datepicker__select-year" tabindex="-1">' + arr.join('') + '</select></div>'
 
     if (opts.showMonthAfterYear) {
       html += yearHtml + monthHtml
@@ -366,23 +367,23 @@
     return html
   }
 
-  var renderTable = function (opts, data, randId) {
+  const renderTable = (opts, data, randId) => {
     return '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="grid" aria-labelledby="' + randId + '">' + renderHead(opts) + renderBody(data) + '</table>'
   }
 
   /**
    * PlainPicker constructor
    */
-  var PlainPicker = function (options) {
-    var self = this
-    var opts = self.config(options)
+  const PlainPicker = function (options) {
+    const self = this
+    const opts = self.config(options)
 
-    self._onMouseDown = function (e) {
+    self._onMouseDown = e => {
       if (!self._v) {
         return
       }
       e = e || window.event
-      var target = e.target || e.srcElement
+      const target = e.target || e.srcElement
       if (!target) {
         return
       }
@@ -392,7 +393,7 @@
           console.log('is-date')
           self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
           if (opts.bound) {
-            setTimeout(function () {
+            setTimeout(() => {
               // selectable date range on single calendar
               if (opts.rangeSelect) {
                 console.log('rangeSelectable')
@@ -426,9 +427,9 @@
     }
 
     // <select>
-    self._onChange = function (e) {
+    self._onChange = e => {
       e = e || window.event
-      var target = e.target || e.srcElement
+      const target = e.target || e.srcElement
       if (!target) {
         return
       }
@@ -440,7 +441,7 @@
       console.log('onchange')
     }
 
-    self._onKeyChange = function (e) {
+    self._onKeyChange = e => {
       e = e || window.event
 
       if (self.isVisible()) {
@@ -472,8 +473,8 @@
       }
     }
 
-    self._onInputChange = function (e) {
-      var date
+    self._onInputChange = e => {
+      let date
 
       if (e.firedBy === self) {
         return
@@ -491,16 +492,16 @@
       }
     }
 
-    self._onInputFocus = function () {
+    self._onInputFocus = () => {
       self.show()
     }
 
-    self._onInputClick = function () {
+    self._onInputClick = () => {
       self.show()
     }
 
-    self._onInputBlur = function () {
-      var pEl = document.activeElement
+    self._onInputBlur = () => {
+      let pEl = document.activeElement
       do {
         if (hasClass(pEl, 'datepicker')) {
           return
@@ -509,17 +510,17 @@
       while ((pEl = pEl.parentNode))
 
       if (!self._c) {
-        self._b = setTimeout(function () {
+        self._b = setTimeout(() => {
           self.hide()
         }, 50)
       }
       self._c = false
     }
 
-    self._onClick = function (e) {
+    self._onClick = e => {
       e = e || window.event
-      var target = e.target || e.srcElement
-      var pEl = target
+      const target = e.target || e.srcElement
+      let pEl = target
 
       if (!target) {
         return
@@ -559,7 +560,7 @@
       }
     }
 
-    var defDate = opts.defaultDate
+    const defDate = opts.defaultDate
 
     if (isDate(defDate)) {
       if (opts.setDefaultDate) {
@@ -595,7 +596,7 @@
         this._o = extend({}, defaults, true)
       }
 
-      var opts = extend(this._o, options, true)
+      const opts = extend(this._o, options, true)
 
       opts.isRTL = !!opts.isRTL
 
@@ -611,7 +612,7 @@
 
       opts.disableDayFn = (typeof opts.disableDayFn) === 'function' ? opts.disableDayFn : null
 
-      var nom = parseInt(opts.numberOfMonths, 10) || 1
+      const nom = parseInt(opts.numberOfMonths, 10) || 1
       opts.numberOfMonths = nom > 4 ? 4 : nom
 
       if (!isDate(opts.minDate)) {
@@ -631,7 +632,7 @@
       }
 
       if (isArray(opts.yearRange)) {
-        var fallback = new Date().getFullYear() - 10
+        const fallback = new Date().getFullYear() - 10
         opts.yearRange[0] = parseInt(opts.yearRange[0], 10) || fallback
         opts.yearRange[1] = parseInt(opts.yearRange[1], 10) || fallback
       } else {
@@ -689,8 +690,8 @@
         return
       }
 
-      var min = this._o.minDate
-      var max = this._o.maxDate
+      const min = this._o.minDate
+      const max = this._o.maxDate
 
       if (isDate(min) && date < min) {
         date = min
@@ -717,16 +718,16 @@
      * change view to a specific date
      */
     gotoDate: function (date) {
-      var newCalendar = true
+      let newCalendar = true
 
       if (!isDate(date)) {
         return
       }
 
       if (this.calendars) {
-        var firstVisibleDate = new Date(this.calendars[0].year, this.calendars[0].month, 1)
-        var lastVisibleDate = new Date(this.calendars[this.calendars.length - 1].year, this.calendars[this.calendars.length - 1].month, 1)
-        var visibleDate = date.getTime()
+        const firstVisibleDate = new Date(this.calendars[0].year, this.calendars[0].month, 1)
+        const lastVisibleDate = new Date(this.calendars[this.calendars.length - 1].year, this.calendars[this.calendars.length - 1].month, 1)
+        const visibleDate = date.getTime()
         // get the end of the month
         lastVisibleDate.setMonth(lastVisibleDate.getMonth() + 1)
         lastVisibleDate.setDate(lastVisibleDate.getDate() - 1)
@@ -747,10 +748,10 @@
     },
 
     adjustDate: function (sign, days) {
-      var day = this.getDate() || new Date()
-      var difference = parseInt(days) * 24 * 60 * 60 * 1000
+      const day = this.getDate() || new Date()
+      const difference = parseInt(days) * 24 * 60 * 60 * 1000
 
-      var newDay
+      let newDay
 
       if (sign === 'add') {
         newDay = new Date(day.valueOf() + difference)
@@ -762,8 +763,10 @@
     },
 
     adjustCalendars: function () {
+      let c
+
       this.calendars[0] = adjustCalendar(this.calendars[0])
-      for (var c = 1; c < this._o.numberOfMonths; c++) {
+      for (c = 1; c < this._o.numberOfMonths; c++) {
         this.calendars[c] = adjustCalendar({
           month: this.calendars[0].month + c,
           year: this.calendars[0].year
@@ -860,13 +863,13 @@
         return
       }
 
-      var opts = this._o
-      var minYear = opts.minYear
-      var maxYear = opts.maxYear
-      var minMonth = opts.minMonth
-      var maxMonth = opts.maxMonth
-      var html = ''
-      var randId
+      const opts = this._o
+      const minYear = opts.minYear
+      const maxYear = opts.maxYear
+      const minMonth = opts.minMonth
+      const maxMonth = opts.maxMonth
+      let html = ''
+      let randId
 
       if (this._y <= minYear) {
         this._y = minYear
@@ -883,7 +886,8 @@
 
       randId = 'datepicker__title-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 2)
 
-      for (var c = 0; c < opts.numberOfMonths; c++) {
+      let c
+      for (c = 0; c < opts.numberOfMonths; c++) {
         html += '<div class="datepicker__lendar">' + renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) + this.render(this.calendars[c].year, this.calendars[c].month, randId) + '</div>'
       }
 
@@ -891,7 +895,7 @@
 
       if (opts.bound) {
         if (opts.field.type !== 'hidden') {
-          setTimeout(function () {
+          setTimeout(() => {
             opts.trigger.focus()
           }, 1)
         }
@@ -908,22 +912,22 @@
     },
 
     adjustPosition: function () {
-      var field, pEl, width, height, viewportWidth, viewportHeight, scrollTop, left, top, clientRect
-
       if (this._o.container) return
 
       this.el.style.position = 'absolute'
 
-      field = this._o.trigger
-      pEl = field
-      width = this.el.offsetWidth
-      height = this.el.offsetHeight
-      viewportWidth = window.innerWidth || document.documentElement.clientWidth
-      viewportHeight = window.innerHeight || document.documentElement.clientHeight
-      scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
+      const field = this._o.trigger
+      let pEl = field
+      const width = this.el.offsetWidth
+      const height = this.el.offsetHeight
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight
+      const scrollTop = window.pageYOffset || document.body.scrollTop || document.documentElement.scrollTop
+      let left
+      let top
 
       if (typeof field.getBoundingClientRect === 'function') {
-        clientRect = field.getBoundingClientRect()
+        const clientRect = field.getBoundingClientRect()
         left = clientRect.left + window.pageXOffset
         top = clientRect.bottom + window.pageYOffset
       } else {
@@ -936,20 +940,16 @@
       }
 
       // default position is bottom & left
-      if ((this._o.reposition && left + width > viewportWidth) ||
-        (
+      if ((this._o.reposition && left + width > viewportWidth) || (
           this._o.position.indexOf('right') > -1 &&
           left - width + field.offsetWidth > 0
-        )
-      ) {
+        )) {
         left = left - width + field.offsetWidth
       }
-      if ((this._o.reposition && top + height > viewportHeight + scrollTop) ||
-        (
+      if ((this._o.reposition && top + height > viewportHeight + scrollTop) || (
           this._o.position.indexOf('top') > -1 &&
           top - height - field.offsetHeight > 0
-        )
-      ) {
+        )) {
         top = top - height - field.offsetHeight
       }
 
@@ -961,44 +961,51 @@
      * render HTML for a particular month
      */
     render: function (year, month, randId) {
-      var opts = this._o
-      var now = new Date()
-      var days = getDaysInMonth(year, month)
-      var before = new Date(year, month, 1).getDay()
-      var data = []
-      var row = []
+      const opts = this._o
+      const now = new Date()
+      const days = getDaysInMonth(year, month)
+      let before = new Date(year, month, 1).getDay()
+      let data = []
+      let row = []
+
       setToStartOfDay(now)
+
       if (opts.firstDay > 0) {
         before -= opts.firstDay
         if (before < 0) {
           before += 7
         }
       }
-      var previousMonth = month === 0 ? 11 : month - 1
-      var nextMonth = month === 11 ? 0 : month + 1
-      var yearOfPreviousMonth = month === 0 ? year - 1 : year
-      var yearOfNextMonth = month === 11 ? year + 1 : year
-      var daysInPreviousMonth = getDaysInMonth(yearOfPreviousMonth, previousMonth)
-      var cells = days + before
-      var after = cells
+
+      const previousMonth = month === 0 ? 11 : month - 1
+      const nextMonth = month === 11 ? 0 : month + 1
+      const yearOfPreviousMonth = month === 0 ? year - 1 : year
+      const yearOfNextMonth = month === 11 ? year + 1 : year
+      const daysInPreviousMonth = getDaysInMonth(yearOfPreviousMonth, previousMonth)
+      let cells = days + before
+      let after = cells
+
       while (after > 7) {
         after -= 7
       }
+
       cells += 7 - after
-      var isWeekSelected = false
-      for (var i = 0, r = 0; i < cells; i++) {
-        var day = new Date(year, month, 1 + (i - before))
-        var isSelected = isDate(this._d) ? compareDates(day, this._d) : false
-        var isToday = compareDates(day, now)
-        var hasEvent = opts.events.indexOf(day.toDateString()) !== -1
-        var isEmpty = i < before || i >= (days + before)
-        var dayNumber = 1 + (i - before)
-        var monthNumber = month
-        var yearNumber = year
-        var isStartRange = opts.startRange && compareDates(opts.startRange, day)
-        var isEndRange = opts.endRange && compareDates(opts.endRange, day)
-        var isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange
-        var isDisabled = (opts.minDate && day < opts.minDate) ||
+      let isWeekSelected = false
+      let i, r
+
+      for (i = 0, r = 0; i < cells; i++) {
+        const day = new Date(year, month, 1 + (i - before))
+        const isSelected = isDate(this._d) ? compareDates(day, this._d) : false
+        const isToday = compareDates(day, now)
+        const hasEvent = opts.events.indexOf(day.toDateString()) !== -1
+        const isEmpty = i < before || i >= (days + before)
+        let dayNumber = 1 + (i - before)
+        let monthNumber = month
+        let yearNumber = year
+        const isStartRange = opts.startRange && compareDates(opts.startRange, day)
+        const isEndRange = opts.endRange && compareDates(opts.endRange, day)
+        const isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange
+        const isDisabled = (opts.minDate && day < opts.minDate) ||
           (opts.maxDate && day > opts.maxDate) ||
           (opts.disableWeekends && isWeekend(day)) ||
           (opts.disableDayFn && opts.disableDayFn(day))
@@ -1015,7 +1022,7 @@
           }
         }
 
-        var dayConfig = {
+        const dayConfig = {
           day: dayNumber,
           month: monthNumber,
           year: yearNumber,
@@ -1070,7 +1077,7 @@
     },
 
     hide: function () {
-      var v = this._v
+      const v = this._v
       if (v !== false) {
         if (this._o.bound) {
           removeEvent(document, 'click', this._onClick)
@@ -1086,9 +1093,6 @@
       }
     },
 
-    /**
-     * GAME OVER
-     */
     destroy: function () {
       this.hide()
       removeEvent(this.el, 'mousedown', this._onMouseDown, true)

@@ -1,4 +1,5 @@
 import eslint from 'rollup-plugin-eslint'
+import babel from 'rollup-plugin-babel'
 
 export default {
   entry: 'src/js/app.js',
@@ -6,6 +7,9 @@ export default {
   dest: 'public/js/bundle.js',
   sourceMap: 'inline',
   plugins: [
-    eslint()
+    eslint(),
+    babel({
+      exclude: 'node_modules/**'
+    })
   ]
 }
