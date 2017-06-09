@@ -6,7 +6,7 @@
   "scripts": {
     "js": "rollup -c",
     "watch-js": "rollup -c -w",
-    "lint-js": "eslint *.js",
+    "lint-js": "eslint src",
     "css": "postcss -c postcss.config.js -o public/css/app.css src/css/app.css",
     "watch-css": "postcss -c postcss.config.js -o public/css/app.css src/css/app.css -w --map",
     "lint-css": "stylelint -c .stylelintrc 'src/**/*.css'",
@@ -30,6 +30,7 @@
     "postcss-cli": "^4.0.0",
     "postcss-nested": "^2.0.2",
     "rollup": "^0.42.0",
+    "rollup-plugin-eslint": "^3.0.0",
     "rollup-watch": "^4.0.0",
     "stylelint": "^7.10.1",
     "stylelint-config-standard": "^16.0.0"

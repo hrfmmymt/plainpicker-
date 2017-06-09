@@ -3,7 +3,6 @@
    * feature detection and helper functions
    */
   var document = window.document
-  var sto = window.setTimeout
   var addEvent = function (el, e, callback, capture) {
     el.addEventListener(e, callback, !!capture)
   }
@@ -109,61 +108,61 @@
     return calendar
   }
 
-    /**
-     * defaults and localisation
-     */
+  /**
+   * defaults and localisation
+   */
   var defaults = {
 
-      // bind the picker to a form field
+    // bind the picker to a form field
     field: null,
 
-      // automatically show/hide the picker on `field` focus (default `true` if `field` is set)
+    // automatically show/hide the picker on `field` focus (default `true` if `field` is set)
     bound: undefined,
 
-      // position of the datepicker, relative to the field (default to bottom & left)
-      // ('bottom' & 'left' keywords are not used, 'top' & 'right' are modifier on the bottom/left position)
+    // position of the datepicker, relative to the field (default to bottom & left)
+    // ('bottom' & 'left' keywords are not used, 'top' & 'right' are modifier on the bottom/left position)
     position: 'bottom left',
 
-      // automatically fit in the viewport even if it means repositioning from the position option
+    // automatically fit in the viewport even if it means repositioning from the position option
     reposition: true,
 
-      // the default output format for `.toString()` and `field` value
+    // the default output format for `.toString()` and `field` value
     format: 'YYYY-MM-DD',
 
-      // the toString function which gets passed a current date object and format
-      // and returns a string
+    // the toString function which gets passed a current date object and format
+    // and returns a string
     toString: null,
 
-      // used to create date object from current input string
+    // used to create date object from current input string
     parse: null,
 
-      // the initial date to view when first opened
+    // the initial date to view when first opened
     defaultDate: null,
 
-      // make the `defaultDate` the initial selected value
+    // make the `defaultDate` the initial selected value
     setDefaultDate: false,
 
-      // first day of week (0: Sunday, 1: Monday etc)
+    // first day of week (0: Sunday, 1: Monday etc)
     firstDay: 0,
 
-      // the default flag for moment's strict date parsing
+    // the default flag for moment's strict date parsing
     formatStrict: false,
 
-      // the minimum/earliest date that can be selected
+    // the minimum/earliest date that can be selected
     minDate: null,
-      // the maximum/latest date that can be selected
+    // the maximum/latest date that can be selected
     maxDate: null,
 
-      // number of years either side, or array of upper/lower range
+    // number of years either side, or array of upper/lower range
     yearRange: 10,
 
-      // show week numbers at head of row
+    // show week numbers at head of row
     showWeekNumber: false,
 
-      // Week picker mode
+    // Week picker mode
     pickWholeWeek: false,
 
-      // used internally (don't config outside)
+    // used internally (don't config outside)
     minYear: 0,
     maxYear: 9999,
     minMonth: undefined,
@@ -174,32 +173,32 @@
 
     isRTL: false,
 
-      // Additional text to append to the year in the calendar title
+    // Additional text to append to the year in the calendar title
     yearSuffix: '',
 
-      // Render the month after year in the calendar title
+    // Render the month after year in the calendar title
     showMonthAfterYear: false,
 
-      // Render days of the calendar grid that fall in the next or previous month
+    // Render days of the calendar grid that fall in the next or previous month
     showDaysInNextAndPreviousMonths: false,
 
-      // Allows user to select days that fall in the next or previous month
+    // Allows user to select days that fall in the next or previous month
     enableSelectionDaysInNextAndPreviousMonths: false,
 
-      // how many months are visible
+    // how many months are visible
     numberOfMonths: 1,
 
-      // when numberOfMonths is used, this will help you to choose where the main calendar will be (default `left`, can be set to `right`)
-      // only used for the first display or when a selected date is not visible
+    // when numberOfMonths is used, this will help you to choose where the main calendar will be (default `left`, can be set to `right`)
+    // only used for the first display or when a selected date is not visible
     mainCalendar: 'left',
 
-      // Specify a DOM element to render the calendar in
+    // Specify a DOM element to render the calendar in
     container: undefined,
 
-      // Blur field when date is selected
+    // Blur field when date is selected
     blurFieldOnSelect: true,
 
-      // internationalization
+    // internationalization
     i18n: {
       previousMonth: 'Prev Month',
       nextMonth: 'Next Month',
@@ -208,22 +207,24 @@
       weekdaysShort: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     },
 
-      // Theme Classname
+    // Theme Classname
     theme: null,
 
-      // events array
+    // events array
     events: [],
 
-      // callback function
+    rangeSelect: false,
+
+    // callback function
     onSelect: null,
     onOpen: null,
     onClose: null,
     onDraw: null
   }
 
-    /**
-     * templating functions to abstract HTML rendering
-     */
+  /**
+   * templating functions to abstract HTML rendering
+   */
   var renderDayName = function (opts, day, abbr) {
     day += opts.firstDay
     while (day >= 7) {
@@ -360,7 +361,9 @@
       html += '<button class="datepicker__next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>'
     }
 
-    return html += '</div>'
+    html += '</div>'
+
+    return html
   }
 
   var renderTable = function (opts, data, randId) {
@@ -386,23 +389,30 @@
 
       if (!hasClass(target, 'is-disabled')) {
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
+          console.log('is-date')
           self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
           if (opts.bound) {
-            sto(function () {
-              self.hide()
-              if (opts.blurFieldOnSelect && opts.field) {
-                opts.field.blur()
+            setTimeout(function () {
+              // selectable date range on single calendar
+              if (opts.rangeSelect) {
+                console.log('rangeSelectable')
+              } else {
+                self.hide()
+                if (opts.blurFieldOnSelect && opts.field) {
+                  opts.field.blur()
+                }
               }
             }, 100)
           }
         } else if (hasClass(target, 'datepicker__prev')) {
+          console.log('is-prev')
           self.prevMonth()
         } else if (hasClass(target, 'datepicker__next')) {
+          console.log('is-next')
           self.nextMonth()
         }
       }
       if (!hasClass(target, 'datepicker__select')) {
-          // if this is touch event prevent mouse events emulation
         if (e.preventDefault) {
           e.preventDefault()
         } else {
@@ -411,9 +421,11 @@
         }
       } else {
         self._c = true
+        console.log('is-select')
       }
     }
 
+    // <select>
     self._onChange = function (e) {
       e = e || window.event
       var target = e.target || e.srcElement
@@ -425,6 +437,7 @@
       } else if (hasClass(target, 'datepicker__select-year')) {
         self.gotoYear(target.value)
       }
+      console.log('onchange')
     }
 
     self._onKeyChange = function (e) {
@@ -435,7 +448,11 @@
           case 13:
           case 27:
             if (opts.field) {
-              opts.field.blur()
+              if (opts.rangeSelect) {
+                console.log('rangeSelectable')
+              } else {
+                opts.field.blur()
+              }
             }
             break
           case 37:
@@ -492,7 +509,7 @@
       while ((pEl = pEl.parentNode))
 
       if (!self._c) {
-        self._b = sto(function () {
+        self._b = setTimeout(function () {
           self.hide()
         }, 50)
       }
@@ -694,7 +711,6 @@
       if (!preventOnSelect && typeof this._o.onSelect === 'function') {
         this._o.onSelect.call(this, this.getDate())
       }
-      console.log(this)
     },
 
     /**
@@ -875,7 +891,7 @@
 
       if (opts.bound) {
         if (opts.field.type !== 'hidden') {
-          sto(function () {
+          setTimeout(function () {
             opts.trigger.focus()
           }, 1)
         }
