@@ -377,6 +377,8 @@
   const PlainPicker = function (options) {
     const self = this
     const opts = self.config(options)
+    self.dateRangeArr = []
+    self.dateRangeSelectedArr = []
 
     self._onMouseDown = e => {
       if (!self._v) {
@@ -390,14 +392,19 @@
 
       if (!hasClass(target, 'is-disabled')) {
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
-          console.log('is-date')
-          self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
           if (opts.bound) {
             setTimeout(() => {
               // selectable date range on single calendar
               if (opts.rangeSelect) {
-                console.log('rangeSelectable')
+                let selectedDate = new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day'))
+                self.dateRangeArr.push(selectedDate)
+                if (self.dateRangeArr.length > 2) self.dateRangeArr.shift()
+                console.log(self.dateRangeArr)
+                self.dateRangeArr.forEach(function (e) {
+                  self.setDate(e)
+                })
               } else {
+                self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
                 self.hide()
                 if (opts.blurFieldOnSelect && opts.field) {
                   opts.field.blur()
@@ -406,10 +413,8 @@
             }, 100)
           }
         } else if (hasClass(target, 'datepicker__prev')) {
-          console.log('is-prev')
           self.prevMonth()
         } else if (hasClass(target, 'datepicker__next')) {
-          console.log('is-next')
           self.nextMonth()
         }
       }
@@ -422,7 +427,6 @@
         }
       } else {
         self._c = true
-        console.log('is-select')
       }
     }
 
@@ -438,7 +442,6 @@
       } else if (hasClass(target, 'datepicker__select-year')) {
         self.gotoYear(target.value)
       }
-      console.log('onchange')
     }
 
     self._onKeyChange = e => {
@@ -671,17 +674,19 @@
      * set the current selection
      */
     setDate: function (date, preventOnSelect) {
+      const self = this
+
       if (!date) {
-        this._d = null
+        self._d = null
 
         if (this._o.field) {
-          this._o.field.value = ''
-          fireEvent(this._o.field, 'change', {
-            firedBy: this
+          self._o.field.value = ''
+          fireEvent(self._o.field, 'change', {
+            firedBy: self
           })
         }
 
-        return this.draw()
+        return self.draw()
       }
       if (typeof date === 'string') {
         date = new Date(Date.parse(date))
@@ -690,8 +695,8 @@
         return
       }
 
-      const min = this._o.minDate
-      const max = this._o.maxDate
+      const min = self._o.minDate
+      const max = self._o.maxDate
 
       if (isDate(min) && date < min) {
         date = min
@@ -699,18 +704,24 @@
         date = max
       }
 
-      this._d = new Date(date.getTime())
-      setToStartOfDay(this._d)
-      this.gotoDate(this._d)
+      self._d = new Date(date.getTime())
+      setToStartOfDay(self._d)
+      self.gotoDate(self._d)
 
-      if (this._o.field) {
-        this._o.field.value = this.toString()
-        fireEvent(this._o.field, 'change', {
-          firedBy: this
+      if (self._o.field) {
+        self._o.field.value = self.toString()
+        fireEvent(self._o.field, 'change', {
+          firedBy: self
         })
       }
-      if (!preventOnSelect && typeof this._o.onSelect === 'function') {
-        this._o.onSelect.call(this, this.getDate())
+      if (!preventOnSelect && typeof self._o.onSelect === 'function') {
+        self._o.onSelect.call(self, self.getDate())
+      }
+
+      if (self._o.rangeSelect) {
+        let newArr = self.dateRangeArr.map(el => self.toString(el))
+        console.log(newArr)
+        self._o.field.value = newArr.join(' - ')
       }
     },
 
