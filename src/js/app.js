@@ -377,6 +377,7 @@
   const PlainPicker = function (options) {
     const self = this
     const opts = self.config(options)
+    const defOptsMinDate = opts.minDate
     self.dateRangeArr = []
     self.dateRangeSelectedArr = []
 
@@ -394,15 +395,28 @@
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
           if (opts.bound) {
             setTimeout(() => {
-              // selectable date range on single calendar
-              if (opts.rangeSelect) {
+              if (opts.rangeSelect) { // selectable date range on single calendar
                 let selectedDate = new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day'))
+                addClass(target, 'datepicker__button--selected')
+                self.setMinDate(selectedDate)
+
                 self.dateRangeArr.push(selectedDate)
-                if (self.dateRangeArr.length > 2) self.dateRangeArr.shift()
-                console.log(self.dateRangeArr)
+
+                // 選択可能は二つまで。とりあえず
+                if (self.dateRangeArr.length > 2) {
+                  self.dateRangeArr.shift()
+                }
+
                 self.dateRangeArr.forEach(function (e) {
                   self.setDate(e)
                 })
+                if (self.dateRangeArr.length > 1) {
+                  self.hide()
+                  self.setMinDate(defOptsMinDate)
+                }
+                if (opts.blurFieldOnSelect && opts.field) {
+                  opts.field.blur()
+                }
               } else {
                 self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
                 self.hide()
@@ -719,9 +733,7 @@
       }
 
       if (self._o.rangeSelect) {
-        let newArr = self.dateRangeArr.map(el => self.toString(el))
-        console.log(newArr)
-        self._o.field.value = newArr.join(' - ')
+        self._o.field.value = self.dateRangeArr.join(' TO ')
       }
     },
 
