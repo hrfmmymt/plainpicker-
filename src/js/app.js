@@ -3,60 +3,40 @@
    * feature detection and helper functions
    */
   const document = window.document
-  const addEvent = (el, e, callback, capture) => {
-    el.addEventListener(e, callback, !!capture)
-  }
+  const addEvent = (el, e, callback, capture) => el.addEventListener(e, callback, !!capture)
 
-  const removeEvent = (el, e, callback, capture) => {
-    el.removeEventListener(e, callback, !!capture)
-  }
+  const removeEvent = (el, e, callback, capture) => el.removeEventListener(e, callback, !!capture)
 
-  const trim = str => {
-    return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '')
-  }
+  const trim = str => str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '')
 
-  const hasClass = (el, cn) => {
-    return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
-  }
+  const hasClass = (el, cn) => (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
 
   const addClass = (el, cn) => {
-    if (!hasClass(el, cn)) {
-      el.className = (el.className === '') ? cn : el.className + ' ' + cn
-    }
+    if (!hasClass(el, cn)) el.className = (el.className === '') ? cn : el.className + ' ' + cn
   }
 
   const removeClass = (el, cn) => {
     el.className = trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '))
   }
 
-  const isArray = obj => {
-    return (/Array/).test(Object.prototype.toString.call(obj))
-  }
+  const isArray = obj => (/Array/).test(Object.prototype.toString.call(obj))
 
-  const isDate = obj => {
-    return (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
-  }
+  const isDate = obj => (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
 
   const isWeekend = date => {
     const day = date.getDay()
     return day === 0 || day === 6
   }
 
-  const isLeapYear = year => {
-    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
-  }
+  const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
 
-  const getDaysInMonth = (year, month) => {
-    return [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
-  }
+  const getDaysInMonth = (year, month) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
 
   const setToStartOfDay = date => {
     if (isDate(date)) date.setHours(0, 0, 0, 0)
   }
 
-  const compareDates = (a, b) => {
-    return a.getTime() === b.getTime()
-  }
+  const compareDates = (a, b) => a.getTime() === b.getTime()
 
   const extend = (to, from, overwrite) => {
     let prop
@@ -249,34 +229,28 @@
         return '<td class="is-empty"></td>'
       }
     }
-    if (opts.isDisabled) {
-      arr.push('is-disabled')
-    }
-    if (opts.isToday) {
-      arr.push('is-today')
-    }
+    if (opts.isDisabled) arr.push('is-disabled')
+
+    if (opts.isToday) arr.push('is-today')
+
     if (opts.isSelected) {
       arr.push('is-selected')
       ariaSelected = 'true'
     }
-    if (opts.hasEvent) {
-      arr.push('has-event')
-    }
-    if (opts.isInRange) {
-      arr.push('is-inrange')
-    }
-    if (opts.isStartRange) {
-      arr.push('is-startrange')
-    }
-    if (opts.isEndRange) {
-      arr.push('is-endrange')
-    }
+    if (opts.hasEvent) arr.push('has-event')
+
+    if (opts.isInRange) arr.push('is-inrange')
+
+    if (opts.isStartRange) arr.push('is-startrange')
+
+    if (opts.isEndRange) arr.push('is-endrange')
+
     return '<td data-day="' + opts.day + '" class="' + arr.join(' ') + '" aria-selected="' + ariaSelected + '">' +
-        '<button class="datepicker__button datepicker__day" type="button" ' +
-        'data-datepicker-year="' + opts.year + '" data-datepicker-month="' + opts.month + '" data-datepicker-day="' + opts.day + '">' +
-        opts.day +
-        '</button>' +
-        '</td>'
+              '<button class="datepicker__button datepicker__day" type="button" ' +
+                'data-datepicker-year="' + opts.year + '" data-datepicker-month="' + opts.month + '" data-datepicker-day="' + opts.day + '">' +
+                opts.day +
+              '</button>' +
+           '</td>'
   }
 
   const renderWeek = (d, m, y) => {
@@ -285,13 +259,9 @@
     return '<td class="datepicker__week">' + weekNum + '</td>'
   }
 
-  const renderRow = (days, isRTL, pickWholeWeek, isRowSelected) => {
-    return '<tr class="datepicker__row' + (pickWholeWeek ? ' pick-whole-week' : '') + (isRowSelected ? ' is-selected' : '') + '">' + (isRTL ? days.reverse() : days).join('') + '</tr>'
-  }
+  const renderRow = (days, isRTL, pickWholeWeek, isRowSelected) => '<tr class="datepicker__row' + (pickWholeWeek ? ' pick-whole-week' : '') + (isRowSelected ? ' is-selected' : '') + '">' + (isRTL ? days.reverse() : days).join('') + '</tr>'
 
-  const renderBody = rows => {
-    return '<tbody>' + rows.join('') + '</tbody>'
-  }
+  const renderBody = rows => '<tbody>' + rows.join('') + '</tbody>'
 
   const renderHead = opts => {
     let i
@@ -335,9 +305,7 @@
     }
 
     for (arr = []; i < j && i <= opts.maxYear; i++) {
-      if (i >= opts.minYear) {
-        arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"' : '') + '>' + (i) + '</option>')
-      }
+      if (i >= opts.minYear) arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"' : '') + '>' + (i) + '</option>')
     }
     const yearHtml = '<div class="datepicker__label">' + year + opts.yearSuffix + '<select class="datepicker__select datepicker__select-year" tabindex="-1">' + arr.join('') + '</select></div>'
 
@@ -347,29 +315,19 @@
       html += monthHtml + yearHtml
     }
 
-    if (isMinYear && (month === 0 || opts.minMonth >= month)) {
-      prev = false
-    }
+    if (isMinYear && (month === 0 || opts.minMonth >= month)) prev = false
 
-    if (isMaxYear && (month === 11 || opts.maxMonth <= month)) {
-      next = false
-    }
+    if (isMaxYear && (month === 11 || opts.maxMonth <= month)) next = false
 
-    if (c === 0) {
-      html += '<button class="datepicker__prev' + (prev ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousMonth + '</button>'
-    }
-    if (c === (instance._o.numberOfMonths - 1)) {
-      html += '<button class="datepicker__next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>'
-    }
+    if (c === 0) html += '<button class="datepicker__prev' + (prev ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousMonth + '</button>'
+    if (c === (instance._o.numberOfMonths - 1)) html += '<button class="datepicker__next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>'
 
     html += '</div>'
 
     return html
   }
 
-  const renderTable = (opts, data, randId) => {
-    return '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="grid" aria-labelledby="' + randId + '">' + renderHead(opts) + renderBody(data) + '</table>'
-  }
+  const renderTable = (opts, data, randId) => '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="grid" aria-labelledby="' + randId + '">' + renderHead(opts) + renderBody(data) + '</table>'
 
   /**
    * PlainPicker constructor
@@ -382,14 +340,11 @@
     self.dateRangeSelectedArr = []
 
     self._onMouseDown = e => {
-      if (!self._v) {
-        return
-      }
+      if (!self._v) return
+
       e = e || window.event
       const target = e.target || e.srcElement
-      if (!target) {
-        return
-      }
+      if (!target) return
 
       if (!hasClass(target, 'is-disabled')) {
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
@@ -402,14 +357,18 @@
 
                 self.dateRangeArr.push(selectedDate)
 
+                console.log(self.dateRangeArr)
+
                 // 選択可能は二つまで。とりあえず
                 if (self.dateRangeArr.length > 2) {
-                  self.dateRangeArr.shift()
+                  // self.dateRangeArr.shift()
+                  self.dateRangeArr = []
                 }
 
                 self.dateRangeArr.forEach(function (e) {
                   self.setDate(e)
                 })
+
                 if (self.dateRangeArr.length > 1) {
                   self.hide()
                   self.setMinDate(defOptsMinDate)
@@ -448,9 +407,8 @@
     self._onChange = e => {
       e = e || window.event
       const target = e.target || e.srcElement
-      if (!target) {
-        return
-      }
+      if (!target) return
+
       if (hasClass(target, 'datepicker__select-month')) {
         self.gotoMonth(target.value)
       } else if (hasClass(target, 'datepicker__select-year')) {
@@ -493,20 +451,16 @@
     self._onInputChange = e => {
       let date
 
-      if (e.firedBy === self) {
-        return
-      }
+      if (e.firedBy === self) return
+
       if (opts.parse) {
         date = opts.parse(opts.field.value, opts.format)
       } else {
         date = new Date(Date.parse(opts.field.value))
       }
-      if (isDate(date)) {
-        self.setDate(date)
-      }
-      if (!self._v) {
-        self.show()
-      }
+
+      if (isDate(date)) self.setDate(date)
+      if (!self._v) self.show()
     }
 
     self._onInputFocus = () => {
@@ -539,18 +493,14 @@
       const target = e.target || e.srcElement
       let pEl = target
 
-      if (!target) {
-        return
-      }
+      if (!target) return
       do {
         if (hasClass(pEl, 'datepicker') || pEl === opts.trigger) {
           return
         }
       }
       while ((pEl = pEl.parentNode))
-      if (self._v && target !== opts.trigger && pEl !== opts.trigger) {
-        self.hide()
-      }
+      if (self._v && target !== opts.trigger && pEl !== opts.trigger) self.hide()
     }
 
     self.el = document.createElement('div')
@@ -609,9 +559,7 @@
      * configure functionality
      */
     config: function (options) {
-      if (!this._o) {
-        this._o = extend({}, defaults, true)
-      }
+      if (!this._o) this._o = extend({}, defaults, true)
 
       const opts = extend(this._o, options, true)
 
@@ -632,21 +580,15 @@
       const nom = parseInt(opts.numberOfMonths, 10) || 1
       opts.numberOfMonths = nom > 4 ? 4 : nom
 
-      if (!isDate(opts.minDate)) {
-        opts.minDate = false
-      }
-      if (!isDate(opts.maxDate)) {
-        opts.maxDate = false
-      }
-      if ((opts.minDate && opts.maxDate) && opts.maxDate < opts.minDate) {
-        opts.maxDate = opts.minDate = false
-      }
-      if (opts.minDate) {
-        this.setMinDate(opts.minDate)
-      }
-      if (opts.maxDate) {
-        this.setMaxDate(opts.maxDate)
-      }
+      if (!isDate(opts.minDate)) opts.minDate = false
+
+      if (!isDate(opts.maxDate)) opts.maxDate = false
+
+      if ((opts.minDate && opts.maxDate) && opts.maxDate < opts.minDate) opts.maxDate = opts.minDate = false
+
+      if (opts.minDate) this.setMinDate(opts.minDate)
+
+      if (opts.maxDate) this.setMaxDate(opts.maxDate)
 
       if (isArray(opts.yearRange)) {
         const fallback = new Date().getFullYear() - 10
@@ -667,12 +609,9 @@
      */
     toString: function (format) {
       format = format || this._o.format
-      if (!isDate(this._d)) {
-        return ''
-      }
-      if (this._o.toString) {
-        return this._o.toString(this._d, format)
-      }
+      if (!isDate(this._d)) return ''
+
+      if (this._o.toString) return this._o.toString(this._d, format)
 
       return this._d.toDateString()
     },
@@ -702,12 +641,9 @@
 
         return self.draw()
       }
-      if (typeof date === 'string') {
-        date = new Date(Date.parse(date))
-      }
-      if (!isDate(date)) {
-        return
-      }
+      if (typeof date === 'string') date = new Date(Date.parse(date))
+
+      if (!isDate(date)) return
 
       const min = self._o.minDate
       const max = self._o.maxDate
@@ -728,13 +664,9 @@
           firedBy: self
         })
       }
-      if (!preventOnSelect && typeof self._o.onSelect === 'function') {
-        self._o.onSelect.call(self, self.getDate())
-      }
+      if (!preventOnSelect && typeof self._o.onSelect === 'function') self._o.onSelect.call(self, self.getDate())
 
-      if (self._o.rangeSelect) {
-        self._o.field.value = self.dateRangeArr.join(' TO ')
-      }
+      if (self._o.rangeSelect) self._o.field.value = self.dateRangeArr.join(' TO ')
     },
 
     /**
@@ -743,9 +675,7 @@
     gotoDate: function (date) {
       let newCalendar = true
 
-      if (!isDate(date)) {
-        return
-      }
+      if (!isDate(date)) return
 
       if (this.calendars) {
         const firstVisibleDate = new Date(this.calendars[0].year, this.calendars[0].month, 1)
