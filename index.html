@@ -6,41 +6,52 @@
     <link rel="stylesheet" href="public/css/app.css">
   </head>
   <body>
-    <input type="text" id="plainPicker" class="plainPicker">
-    <input type="text" class="plainPicker">
-    <script src="public/js/bundle.js"></script>
+    <div class="pickranger">
+      <div><label>Start</label><input type="text" class="pickranger-start"></div>
+      <div><label>End</label><input type="text" class="pickranger-end"></div>
+    </div>
+
+    <script src="src/js/plainpicker.js"></script>
+    <script src="src/js/pickranger.js"></script>
     <script>
-    var now = new Date()
-    var currentYear = now.getFullYear()
-    var nextYear = currentYear +1
-    var nextYearDate = new Date(nextYear, now.getMonth() +1, now.getDate())
-    var plainPicker = new PlainPicker({
-      numberOfMonths: 2,
-      field: document.getElementById('plainPicker'),
-      trigger: document.getElementsByClassName('plainPicker'),
-      minDate: now,
-      maxDate: new Date(nextYearDate),
-      yearRange: [currentYear, nextYear],
-      i18n: {
-        // previousMonth : '前月',
-        // nextMonth     : '次月',
-        months        : ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-        weekdays      : ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'],
-        weekdaysShort : ['日', '月', '火', '水', '木', '金', '土']
-      },
-      blurFieldOnSelect: false,
-      onSelect: function(date) { // 'YYYY/MM/DD'
-        var year = date.getFullYear(),
-            month = date.getMonth() + 1,
-            day = date.getDate(),
-            formattedDate = [
-              year,
-              month < 10 ? '0' + month : month,
-              day < 10 ? '0' + day : day
-            ].join('/')
-        document.getElementById('plainPicker').value = formattedDate
-      },
-    })
+      document.querySelectorAll('.pickranger').forEach(function(el) {
+        var now = new Date()
+        var currentYear = now.getFullYear()
+        var nextYear = currentYear +1
+        var nextYearDate = new Date(nextYear, now.getMonth() +1, now.getDate())
+        var optionAttr = el.getAttribute('data-options')
+        if (optionAttr) {
+          optionAttr = JSON.parse(optionAttr)
+          for (var i in optionAttr) {
+            if (typeof optionAttr[i] === 'string' && optionAttr[i].match(/^[\d\-]+/)) {
+              options[i] = new Date(optionAttr[i])
+            } else {
+              options[i] = optionAttr[i]
+            }
+          }
+        }
+        var pickRanger = new PickRanger({
+          numberOfMonths: 2,
+          start: {
+            field: el.querySelector('input.pickranger-start'),
+            // trigger: el.querySelector('button.pikarange-start')
+          },
+          end: {
+            field: el.querySelector('input.pickranger-end'),
+            // trigger: el.querySelector('button.pikarange-end')
+          },
+          minDate: now,
+          maxDate: new Date(nextYearDate),
+          yearRange: [currentYear, nextYear],
+          blurFieldOnSelect: false,
+          positionTarget: el,
+          i18n: {
+            months        : ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+            weekdays      : ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日'],
+            weekdaysShort : ['日', '月', '火', '水', '木', '金', '土']
+          },
+        })
+      })
     </script>
   </body>
 </html>

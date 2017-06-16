@@ -152,6 +152,10 @@
     border-color: #5498fb;
   }
 
+  & td.is-inrange .datepicker__button {
+    background-color: #ebebeb;
+  }
+
   &__week {
     font-size: 11px;
     color: #aaa;
@@ -170,6 +174,9 @@
   background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAeCAYAAAAsEj5rAAAAU0lEQVR42u3VOwoAMAgE0dwfAnNjU26bYkBCFGwfiL9VVWoO+BJ4Gf3gtsEKKoFBNTCoCAYVwaAiGNQGMUHMkjGbgjk2mIONuXo0nC8XnCf1JXgArVIZAQh5TKYAAAAASUVORK5CYII=");
 }
 
-.plainPicker {
-  width: 200px;
+.pickranger > * {
+  display: inline-block;
+}
+.pickranger label {
+  display: block;
 }
