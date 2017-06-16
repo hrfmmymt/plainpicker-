@@ -195,8 +195,6 @@
     // events array
     events: [],
 
-    rangeSelect: false,
-
     // callback function
     onSelect: null,
     onOpen: null,
@@ -335,9 +333,6 @@
   const PlainPicker = function (options) {
     const self = this
     const opts = self.config(options)
-    const defOptsMinDate = opts.minDate
-    self.dateRangeArr = []
-    self.dateRangeSelectedArr = []
 
     self._onMouseDown = e => {
       if (!self._v) return
@@ -350,38 +345,10 @@
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
           if (opts.bound) {
             setTimeout(() => {
-              if (opts.rangeSelect) { // selectable date range on single calendar
-                let selectedDate = new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day'))
-                addClass(target, 'datepicker__button--selected')
-                self.setMinDate(selectedDate)
-
-                self.dateRangeArr.push(selectedDate)
-
-                console.log(self.dateRangeArr)
-
-                // 選択可能は二つまで。とりあえず
-                if (self.dateRangeArr.length > 2) {
-                  // self.dateRangeArr.shift()
-                  self.dateRangeArr = []
-                }
-
-                self.dateRangeArr.forEach(function (e) {
-                  self.setDate(e)
-                })
-
-                if (self.dateRangeArr.length > 1) {
-                  self.hide()
-                  self.setMinDate(defOptsMinDate)
-                }
-                if (opts.blurFieldOnSelect && opts.field) {
-                  opts.field.blur()
-                }
-              } else {
-                self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
-                self.hide()
-                if (opts.blurFieldOnSelect && opts.field) {
-                  opts.field.blur()
-                }
+              self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
+              self.hide()
+              if (opts.blurFieldOnSelect && opts.field) {
+                opts.field.blur()
               }
             }, 100)
           }
@@ -424,11 +391,7 @@
           case 13:
           case 27:
             if (opts.field) {
-              if (opts.rangeSelect) {
-                console.log('rangeSelectable')
-              } else {
-                opts.field.blur()
-              }
+              opts.field.blur()
             }
             break
           case 37:
@@ -665,8 +628,6 @@
         })
       }
       if (!preventOnSelect && typeof self._o.onSelect === 'function') self._o.onSelect.call(self, self.getDate())
-
-      if (self._o.rangeSelect) self._o.field.value = self.dateRangeArr.join(' TO ')
     },
 
     /**
