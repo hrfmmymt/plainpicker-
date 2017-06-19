@@ -1,5 +1,13 @@
 parser: babel-eslint
-extends: standard
+extends:
+  - standard
+  - prettier
 plugins:
   - standard
   - promise
+  - prettier
+rules:
+  space-before-function-paren:
+    - 1
+    - never
+  no-var: 1
