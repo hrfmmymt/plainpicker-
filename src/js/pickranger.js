@@ -1,11 +1,11 @@
-(function () {
+;(function() {
   /**
    * feature detection and helper functions
    */
 
-  var hasEventListeners = !!window.addEventListener
+  const hasEventListeners = !!window.addEventListener
 
-  var addEvent = function (el, e, callback, capture) {
+  const addEvent = function(el, e, callback, capture) {
     if (hasEventListeners) {
       el.addEventListener(e, callback, !!capture)
     } else {
@@ -13,7 +13,7 @@
     }
   }
 
-  var removeEvent = function (el, e, callback, capture) {
+  const removeEvent = function(el, e, callback, capture) {
     if (hasEventListeners) {
       el.removeEventListener(e, callback, !!capture)
     } else {
@@ -21,20 +21,21 @@
     }
   }
 
-  var hasClass = function (el, cn) {
+  const hasClass = function(el, cn) {
     return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
   }
 
-  var daysToTime = function (days) {
+  const daysToTime = function(days) {
     return days * 24 * 3600000
   }
 
-  var extend = function (out) {
+  const extend = function(out) {
     out = out || {}
-    for (var o, i = 1; i < arguments.length; i++) {
+    let o, i
+    for (o, i = 1; i < arguments.length; i++) {
       o = arguments[i]
       if (!o) continue
-      for (var key in o) {
+      for (let key in o) {
         if (o.hasOwnProperty(key)) {
           out[key] = o[key]
         }
@@ -46,21 +47,21 @@
   /**
    * Pikarange constructor
    */
-  var PickRanger = function (options) {
-    var startOptions = options.start.nodeName ? {field: options.start} : options.start
-    var endOptions = options.end.nodeName ? {field: options.end} : options.end
-    var pickerOptions
+  const PickRanger = function(options) {
+    const startOptions = options.start.nodeName ? {field: options.start} : options.start
+    const endOptions = options.end.nodeName ? {field: options.end} : options.end
+    let pickerOptions
 
     delete options.start
     delete options.end
 
     pickerOptions = extend({}, options, startOptions, {autoInit: false})
-    var startPicker = new PlainPicker(pickerOptions)
+    const startPicker = new PlainPicker(pickerOptions)
 
     pickerOptions = extend({}, options, endOptions, {autoInit: false})
-    var endPicker = new PlainPicker(pickerOptions)
+    const endPicker = new PlainPicker(pickerOptions)
 
-    function setStartRange (d, temporary) {
+    function setStartRange(d, temporary) {
       startPicker.setStartRange(d)
       endPicker.setStartRange(d)
 
@@ -70,15 +71,17 @@
       if (temporary) {
         return
       }
-      var minEndDate = options.minDate
-      var time
+
+      let minEndDate = options.minDate
+      let time
       if (typeof endPicker._o.minRange !== 'undefined') {
         time = d.getTime() + daysToTime(endPicker._o.minRange)
         if (!minEndDate || minEndDate < time) {
           minEndDate = new Date(time)
         }
       }
-      var maxEndDate = options.maxDate
+
+      let maxEndDate = options.maxDate
       if (typeof endPicker._o.maxRange !== 'undefined') {
         time = d.getTime() + daysToTime(endPicker._o.maxRange)
         if (!maxEndDate || maxEndDate > time) {
@@ -97,12 +100,16 @@
       }
     }
 
-    function setEndRange (d) {
+    function setEndRange(d) {
       startPicker.setEndRange(d)
       endPicker.setEndRange(d)
     }
 
-    startPicker.on('change', function () {
+    console.log(startPicker._onChange)
+    console.log(startPicker.on)
+
+    startPicker.on('change', function() {
+      console.log('chcanged')
       delete this.originalRange
       setStartRange(this._d)
       if (!endPicker.isValid()) {
@@ -111,46 +118,50 @@
       }
     })
 
-    startPicker.on('select', function () {
-      if ((endPicker._o.trigger || endPicker._o.field)) (endPicker._o.trigger || endPicker._o.field).focus()
+    startPicker.on('select', function() {
+      if (endPicker._o.trigger || endPicker._o.field) (endPicker._o.trigger || endPicker._o.field).focus()
     })
 
-    endPicker.on('change', function () {
+    endPicker.on('change', function() {
       delete this.originalRange
       setEndRange(this._d)
     })
 
-    startPicker.on('close', function () { delete this.originalRange })
-    endPicker.on('close', function () { delete this.originalRange })
+    startPicker.on('close', function() {
+      delete this.originalRange
+    })
+    endPicker.on('close', function() {
+      delete this.originalRange
+    })
 
-    startPicker.on('destroy', function () {
+    startPicker.on('destroy', function() {
       removeEvent(startPicker.el, 'mouseover', handleStartOver)
       removeEvent(endPicker.el, 'mouseover', handleEndOver)
       endPicker.destroy()
     })
 
-    endPicker.on('init', function () {
+    endPicker.on('init', function() {
       startPicker.init()
     })
 
-    startPicker.on('init', function () {
+    startPicker.on('init', function() {
       setStartRange(startPicker._d)
       setEndRange(endPicker._d)
       addEvent(startPicker.el, 'mouseover', handleStartOver)
       addEvent(endPicker.el, 'mouseover', handleEndOver)
     })
 
-    var handleStartOver = getPickerOver(startPicker)
-    var handleEndOver = getPickerOver(endPicker)
+    const handleStartOver = getPickerOver(startPicker)
+    const handleEndOver = getPickerOver(endPicker)
 
-    function getPickerOver (picker) {
-      return function handlePickerOver (event) {
+    function getPickerOver(picker) {
+      return function handlePickerOver(event) {
         if (startPicker._d && endPicker._d) {
           return
         }
-        if (!hasClass(event.target, 'pika-button')) {
+        if (!hasClass(event.target, 'datepicker__button')) {
           if (!picker.outDelay && picker.originalRange) {
-            picker.outDelay = setTimeout(function () {
+            picker.outDelay = setTimeout(function() {
               setStartRange(picker.originalRange[0], true)
               setEndRange(picker.originalRange[1], true)
               delete picker.originalRange
@@ -165,8 +176,12 @@
         if (typeof picker.originalRange === 'undefined') {
           picker.originalRange = [picker._o.startRange, picker._o.endRange]
         }
-        var targetEl = event.target
-        var date = new Date(targetEl.getAttribute('data-pika-year'), targetEl.getAttribute('data-pika-month'), targetEl.getAttribute('data-pika-day'))
+        const targetEl = event.target
+        const date = new Date(
+          targetEl.getAttribute('data-datepicker-year'),
+          targetEl.getAttribute('data-datepicker-month'),
+          targetEl.getAttribute('data-datepicker-day')
+        )
         if (picker === startPicker) {
           setStartRange(date, true)
         } else {

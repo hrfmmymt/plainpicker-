@@ -1,4 +1,5 @@
 ;(function() {
+  'use strict'
   const EvEmitter = (function() {
     function EvEmitter() {}
 
@@ -78,9 +79,9 @@
    * feature detection and helper functions
    */
 
-  const log = function() {
-    console.log.apply(console, arguments)
-  }
+  // const log = function() {
+  //   console.log.apply(console, arguments)
+  // }
 
   const hasEventListeners = !!window.addEventListener
 
@@ -577,7 +578,7 @@
       if (!hasClass(target, 'is-disabled')) {
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
           if (opts.bound) {
-            this._v && console.log('Hiding soon because date has been selected and picker is bound.')
+            // this._v && console.log('Hiding soon because date has been selected and picker is bound.')
             self.hideAfter(200)
           }
           self.setDate(
@@ -741,7 +742,7 @@
       } while ((pEl = pEl.parentNode))
 
       if (!self._c) {
-        this._v && log('Hiding soon because input was blured', event.target, self._b)
+        // this._v && log('Hiding soon because input was blured', event.target, self._b)
         self.hide(true)
       }
       self._c = false
@@ -909,17 +910,19 @@
         }
       }
 
-      const eventTest = /^on([A-Z]\w+)$/
-      Object.keys(opts).forEach(
-        function(key) {
-          const match = key.match(eventTest)
-          if (match) {
-            const type = match[1].toLowerCase()
-            this.on(type, opts[key])
-            delete opts[key]
-          }
-        }.bind(this)
-      )
+      // const eventTest = /^on([A-Z]\w+)$/
+      // Object.keys(opts).forEach(
+      //   function(key) {
+      //     const match = key.match(eventTest)
+      //     console.log(eventTest)
+      //     if (match) {
+      //       const type = match[1].toLowerCase()
+      //       console.log(type)
+      //       this.on(type, opts[key])
+      //       delete opts[key]
+      //     }
+      //   }.bind(this)
+      // )
 
       return opts
     },
