@@ -34,6 +34,7 @@
   &__title {
     position: relative;
     text-align: center;
+
     & select {
       cursor: pointer;
       position: absolute;
@@ -130,6 +131,7 @@
     line-height: 15px;
     text-align: right;
     background: transparent;
+
     &:hover {
       background-color: #ebebeb;
     }
@@ -171,5 +173,5 @@
 }
 
 .plainPicker {
-  width: 200px;
+  width: 600px;
 }

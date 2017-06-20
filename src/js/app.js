@@ -1,4 +1,4 @@
-(function () {
+;(function () {
   /**
    * feature detection and helper functions
    */
@@ -7,28 +7,30 @@
 
   const removeEvent = (el, e, callback, capture) => el.removeEventListener(e, callback, !!capture)
 
-  const trim = str => str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '')
+  const trim = str => (str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, ''))
 
   const hasClass = (el, cn) => (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
 
   const addClass = (el, cn) => {
-    if (!hasClass(el, cn)) el.className = (el.className === '') ? cn : el.className + ' ' + cn
+    if (!hasClass(el, cn)) el.className = el.className === '' ? cn : el.className + ' ' + cn
   }
 
   const removeClass = (el, cn) => {
     el.className = trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '))
   }
 
-  const isArray = obj => (/Array/).test(Object.prototype.toString.call(obj))
+  const isArray = obj => /Array/.test(Object.prototype.toString.call(obj))
 
-  const isDate = obj => (/Date/).test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
+  const isDate = obj => /Date/.test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
+
+  const zeroPadding = num => ('0' + num).slice(-2)
 
   const isWeekend = date => {
     const day = date.getDay()
     return day === 0 || day === 6
   }
 
-  const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)
+  const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
 
   const getDaysInMonth = (year, month) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
 
@@ -94,7 +96,6 @@
    * defaults and localisation
    */
   const defaults = {
-
     // bind the picker to a form field
     field: null,
 
@@ -109,11 +110,11 @@
     reposition: true,
 
     // the default output format for `.toString()` and `field` value
-    format: 'YYYY-MM-DD',
+    // format: 'YYYY-MM-DD',
 
     // the toString function which gets passed a current date object and format
     // and returns a string
-    toString: null,
+    // toString: null,
 
     // used to create date object from current input string
     parse: null,
@@ -195,6 +196,8 @@
     // events array
     events: [],
 
+    rangeSelect: false,
+
     // callback function
     onSelect: null,
     onOpen: null,
@@ -243,21 +246,41 @@
 
     if (opts.isEndRange) arr.push('is-endrange')
 
-    return '<td data-day="' + opts.day + '" class="' + arr.join(' ') + '" aria-selected="' + ariaSelected + '">' +
-              '<button class="datepicker__button datepicker__day" type="button" ' +
-                'data-datepicker-year="' + opts.year + '" data-datepicker-month="' + opts.month + '" data-datepicker-day="' + opts.day + '">' +
-                opts.day +
-              '</button>' +
-           '</td>'
+    return (
+      '<td data-day="' +
+      opts.day +
+      '" class="' +
+      arr.join(' ') +
+      '" aria-selected="' +
+      ariaSelected +
+      '">' +
+      '<button class="datepicker__button datepicker__day" type="button" ' +
+      'data-datepicker-year="' +
+      opts.year +
+      '" data-datepicker-month="' +
+      opts.month +
+      '" data-datepicker-day="' +
+      opts.day +
+      '">' +
+      opts.day +
+      '</button>' +
+      '</td>'
+    )
   }
 
   const renderWeek = (d, m, y) => {
     const onejan = new Date(y, 0, 1)
-    const weekNum = Math.ceil((((new Date(y, m, d) - onejan) / 86400000) + onejan.getDay() + 1) / 7)
+    const weekNum = Math.ceil(((new Date(y, m, d) - onejan) / 86400000 + onejan.getDay() + 1) / 7)
     return '<td class="datepicker__week">' + weekNum + '</td>'
   }
 
-  const renderRow = (days, isRTL, pickWholeWeek, isRowSelected) => '<tr class="datepicker__row' + (pickWholeWeek ? ' pick-whole-week' : '') + (isRowSelected ? ' is-selected' : '') + '">' + (isRTL ? days.reverse() : days).join('') + '</tr>'
+  const renderRow = (days, isRTL, pickWholeWeek, isRowSelected) =>
+    '<tr class="datepicker__row' +
+    (pickWholeWeek ? ' pick-whole-week' : '') +
+    (isRowSelected ? ' is-selected' : '') +
+    '">' +
+    (isRTL ? days.reverse() : days).join('') +
+    '</tr>'
 
   const renderBody = rows => '<tbody>' + rows.join('') + '</tbody>'
 
@@ -286,13 +309,24 @@
     let next = true
 
     for (arr = [], i = 0; i < 12; i++) {
-      arr.push('<option value="' + (year === refYear ? i - c : 12 + i - c) + '"' +
+      arr.push(
+        '<option value="' +
+          (year === refYear ? i - c : 12 + i - c) +
+          '"' +
           (i === month ? ' selected="selected"' : '') +
-          ((isMinYear && i < opts.minMonth) || (isMaxYear && i > opts.maxMonth) ? 'disabled="disabled"' : '') + '>' +
-          opts.i18n.months[i] + '</option>')
+          ((isMinYear && i < opts.minMonth) || (isMaxYear && i > opts.maxMonth) ? 'disabled="disabled"' : '') +
+          '>' +
+          opts.i18n.months[i] +
+          '</option>'
+      )
     }
 
-    const monthHtml = '<div class="datepicker__label">' + opts.i18n.months[month] + '<select class="datepicker__select datepicker__select-month" tabindex="-1">' + arr.join('') + '</select></div>'
+    const monthHtml =
+      '<div class="datepicker__label">' +
+      opts.i18n.months[month] +
+      '<select class="datepicker__select datepicker__select-month" tabindex="-1">' +
+      arr.join('') +
+      '</select></div>'
 
     if (isArray(opts.yearRange)) {
       i = opts.yearRange[0]
@@ -303,9 +337,15 @@
     }
 
     for (arr = []; i < j && i <= opts.maxYear; i++) {
-      if (i >= opts.minYear) arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"' : '') + '>' + (i) + '</option>')
+      if (i >= opts.minYear) arr.push('<option value="' + i + '"' + (i === year ? ' selected="selected"' : '') + '>' + i + '</option>')
     }
-    const yearHtml = '<div class="datepicker__label">' + year + opts.yearSuffix + '<select class="datepicker__select datepicker__select-year" tabindex="-1">' + arr.join('') + '</select></div>'
+    const yearHtml =
+      '<div class="datepicker__label">' +
+      year +
+      opts.yearSuffix +
+      '<select class="datepicker__select datepicker__select-year" tabindex="-1">' +
+      arr.join('') +
+      '</select></div>'
 
     if (opts.showMonthAfterYear) {
       html += yearHtml + monthHtml
@@ -317,15 +357,25 @@
 
     if (isMaxYear && (month === 11 || opts.maxMonth <= month)) next = false
 
-    if (c === 0) html += '<button class="datepicker__prev' + (prev ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousMonth + '</button>'
-    if (c === (instance._o.numberOfMonths - 1)) html += '<button class="datepicker__next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>'
+    if (c === 0) {
+      html += '<button class="datepicker__prev' + (prev ? '' : ' is-disabled') + '" type="button">' + opts.i18n.previousMonth + '</button>'
+    }
+    if (c === instance._o.numberOfMonths - 1) {
+      html += '<button class="datepicker__next' + (next ? '' : ' is-disabled') + '" type="button">' + opts.i18n.nextMonth + '</button>'
+    }
 
     html += '</div>'
 
     return html
   }
 
-  const renderTable = (opts, data, randId) => '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="grid" aria-labelledby="' + randId + '">' + renderHead(opts) + renderBody(data) + '</table>'
+  const renderTable = (opts, data, randId) =>
+    '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="grid" aria-labelledby="' +
+    randId +
+    '">' +
+    renderHead(opts) +
+    renderBody(data) +
+    '</table>'
 
   /**
    * PlainPicker constructor
@@ -333,6 +383,10 @@
   const PlainPicker = function (options) {
     const self = this
     const opts = self.config(options)
+
+    const defOptsMinDate = opts.minDate
+    self.dateRangeArr = []
+    self.dateRangeSelectedArr = []
 
     self._onMouseDown = e => {
       if (!self._v) return
@@ -345,10 +399,49 @@
         if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled')) {
           if (opts.bound) {
             setTimeout(() => {
-              self.setDate(new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day')))
-              self.hide()
-              if (opts.blurFieldOnSelect && opts.field) {
-                opts.field.blur()
+              if (opts.rangeSelect) { // selectable date range on single calendar
+                let selectedDate = new Date(
+                  target.getAttribute('data-datepicker-year'),
+                  target.getAttribute('data-datepicker-month'),
+                  target.getAttribute('data-datepicker-day')
+                )
+
+                addClass(target, 'datepicker__button--started')
+
+                self.setMinDate(selectedDate)
+
+                // 選択可能は二つまで。とりあえず
+                if (self.dateRangeArr.length > 1) {
+                  self.dateRangeArr = []
+                }
+                self.dateRangeArr.push(selectedDate)
+
+                // console.log(self.dateRangeArr)
+
+                self.dateRangeArr.forEach(function (e) {
+                  self.setDate(e)
+                  // console.log(e)
+                })
+
+                if (self.dateRangeArr.length > 1) {
+                  // self.hide()
+                  self.setMinDate(defOptsMinDate)
+                }
+                if (opts.blurFieldOnSelect && opts.field) {
+                  opts.field.blur()
+                }
+              } else {
+                self.setDate(
+                  new Date(
+                    target.getAttribute('data-datepicker-year'),
+                    target.getAttribute('data-datepicker-month'),
+                    target.getAttribute('data-datepicker-day')
+                  )
+                )
+                self.hide()
+                if (opts.blurFieldOnSelect && opts.field) {
+                  opts.field.blur()
+                }
               }
             }, 100)
           }
@@ -367,6 +460,19 @@
         }
       } else {
         self._c = true
+      }
+    }
+
+    self._onMouseOver = e => {
+      e = e || window.event
+      const target = e.target || e.srcElement
+      if (!target) return
+      if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
+        // if (opts.bound) {
+        setTimeout(() => {
+          addClass(target.parentNode, 'datepicker__highlighted')
+        }, 200)
+        // }
       }
     }
 
@@ -440,12 +546,11 @@
         if (hasClass(pEl, 'datepicker')) {
           return
         }
-      }
-      while ((pEl = pEl.parentNode))
+      } while ((pEl = pEl.parentNode))
 
       if (!self._c) {
         self._b = setTimeout(() => {
-          self.hide()
+          // self.hide()
         }, 50)
       }
       self._c = false
@@ -461,8 +566,7 @@
         if (hasClass(pEl, 'datepicker') || pEl === opts.trigger) {
           return
         }
-      }
-      while ((pEl = pEl.parentNode))
+      } while ((pEl = pEl.parentNode))
       if (self._v && target !== opts.trigger && pEl !== opts.trigger) self.hide()
     }
 
@@ -470,6 +574,7 @@
     self.el.className = 'datepicker' + (opts.isRTL ? ' is-rtl' : '') + (opts.theme ? ' ' + opts.theme : '')
 
     addEvent(self.el, 'mousedown', self._onMouseDown, true)
+    addEvent(self.el, 'mouseover', self._onMouseOver, true)
     addEvent(self.el, 'touchend', self._onMouseDown, true)
     addEvent(self.el, 'change', self._onChange)
     addEvent(document, 'keydown', self._onKeyChange)
@@ -517,7 +622,6 @@
    * public PlainPicker API
    */
   PlainPicker.prototype = {
-
     /**
      * configure functionality
      */
@@ -528,17 +632,17 @@
 
       opts.isRTL = !!opts.isRTL
 
-      opts.field = (opts.field && opts.field.nodeName) ? opts.field : null
+      opts.field = opts.field && opts.field.nodeName ? opts.field : null
 
-      opts.theme = (typeof opts.theme) === 'string' && opts.theme ? opts.theme : null
+      opts.theme = typeof opts.theme === 'string' && opts.theme ? opts.theme : null
 
       opts.bound = !!(opts.bound !== undefined ? opts.field && opts.bound : opts.field)
 
-      opts.trigger = (opts.trigger && opts.trigger.nodeName) ? opts.trigger : opts.field
+      opts.trigger = opts.trigger && opts.trigger.nodeName ? opts.trigger : opts.field
 
       opts.disableWeekends = !!opts.disableWeekends
 
-      opts.disableDayFn = (typeof opts.disableDayFn) === 'function' ? opts.disableDayFn : null
+      opts.disableDayFn = typeof opts.disableDayFn === 'function' ? opts.disableDayFn : null
 
       const nom = parseInt(opts.numberOfMonths, 10) || 1
       opts.numberOfMonths = nom > 4 ? 4 : nom
@@ -547,7 +651,7 @@
 
       if (!isDate(opts.maxDate)) opts.maxDate = false
 
-      if ((opts.minDate && opts.maxDate) && opts.maxDate < opts.minDate) opts.maxDate = opts.minDate = false
+      if (opts.minDate && opts.maxDate && opts.maxDate < opts.minDate) opts.maxDate = opts.minDate = false
 
       if (opts.minDate) this.setMinDate(opts.minDate)
 
@@ -570,14 +674,19 @@
     /**
      * return a formatted string of the current selection (using Moment.js if available)
      */
-    toString: function (format) {
-      format = format || this._o.format
-      if (!isDate(this._d)) return ''
+    // toString: function (format) {
+    //   format = format || this._o.format
+    //   if (!isDate(this._d)) {
+    //     return ''
+    //   }
 
-      if (this._o.toString) return this._o.toString(this._d, format)
+    //   if (this._o.toString) {
+    //     console.log(this._o)
+    //     return this._o.toString(this._d, format)
+    //   }
 
-      return this._d.toDateString()
-    },
+    //   return this._d.toDateString()
+    // },
 
     /**
      * return a Date object of the current selection
@@ -604,6 +713,7 @@
 
         return self.draw()
       }
+
       if (typeof date === 'string') date = new Date(Date.parse(date))
 
       if (!isDate(date)) return
@@ -621,13 +731,31 @@
       setToStartOfDay(self._d)
       self.gotoDate(self._d)
 
+      let superArr = []
+
+      self.dateRangeArr.forEach(function (e) {
+        let yyyy = e.getFullYear()
+        let mm = zeroPadding(e.getMonth() + 1)
+        let dd = zeroPadding(e.getDate())
+        let yyyymmdd = yyyy + '/' + mm + '/' + dd
+        superArr.push(yyyymmdd)
+      })
+      console.log(superArr)
+
       if (self._o.field) {
-        self._o.field.value = self.toString()
-        fireEvent(self._o.field, 'change', {
-          firedBy: self
-        })
+        if (self._o.rangeSelect) {
+          self._o.field.value = superArr.join(' - ')
+        } else {
+          self._o.field.value = self.toString()
+          fireEvent(self._o.field, 'change', {
+            firedBy: self
+          })
+        }
       }
-      if (!preventOnSelect && typeof self._o.onSelect === 'function') self._o.onSelect.call(self, self.getDate())
+
+      if (!preventOnSelect && typeof self._o.onSelect === 'function') {
+        self._o.onSelect.call(self, self.getDate())
+      }
     },
 
     /**
@@ -645,14 +773,16 @@
         // get the end of the month
         lastVisibleDate.setMonth(lastVisibleDate.getMonth() + 1)
         lastVisibleDate.setDate(lastVisibleDate.getDate() - 1)
-        newCalendar = (visibleDate < firstVisibleDate.getTime() || lastVisibleDate.getTime() < visibleDate)
+        newCalendar = visibleDate < firstVisibleDate.getTime() || lastVisibleDate.getTime() < visibleDate
       }
 
       if (newCalendar) {
-        this.calendars = [{
-          month: date.getMonth(),
-          year: date.getFullYear()
-        }]
+        this.calendars = [
+          {
+            month: date.getMonth(),
+            year: date.getFullYear()
+          }
+        ]
         if (this._o.mainCalendar === 'right') {
           this.calendars[0].month += 1 - this._o.numberOfMonths
         }
@@ -802,7 +932,11 @@
 
       let c
       for (c = 0; c < opts.numberOfMonths; c++) {
-        html += '<div class="datepicker__lendar">' + renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) + this.render(this.calendars[c].year, this.calendars[c].month, randId) + '</div>'
+        html +=
+          '<div class="datepicker__lendar">' +
+          renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) +
+          this.render(this.calendars[c].year, this.calendars[c].month, randId) +
+          '</div>'
       }
 
       this.el.innerHTML = html
@@ -854,16 +988,16 @@
       }
 
       // default position is bottom & left
-      if ((this._o.reposition && left + width > viewportWidth) || (
-          this._o.position.indexOf('right') > -1 &&
-          left - width + field.offsetWidth > 0
-        )) {
+      if (
+        (this._o.reposition && left + width > viewportWidth) ||
+        (this._o.position.indexOf('right') > -1 && left - width + field.offsetWidth > 0)
+      ) {
         left = left - width + field.offsetWidth
       }
-      if ((this._o.reposition && top + height > viewportHeight + scrollTop) || (
-          this._o.position.indexOf('top') > -1 &&
-          top - height - field.offsetHeight > 0
-        )) {
+      if (
+        (this._o.reposition && top + height > viewportHeight + scrollTop) ||
+        (this._o.position.indexOf('top') > -1 && top - height - field.offsetHeight > 0)
+      ) {
         top = top - height - field.offsetHeight
       }
 
@@ -912,14 +1046,15 @@
         const isSelected = isDate(this._d) ? compareDates(day, this._d) : false
         const isToday = compareDates(day, now)
         const hasEvent = opts.events.indexOf(day.toDateString()) !== -1
-        const isEmpty = i < before || i >= (days + before)
+        const isEmpty = i < before || i >= days + before
         let dayNumber = 1 + (i - before)
         let monthNumber = month
         let yearNumber = year
         const isStartRange = opts.startRange && compareDates(opts.startRange, day)
         const isEndRange = opts.endRange && compareDates(opts.endRange, day)
         const isInRange = opts.startRange && opts.endRange && opts.startRange < day && day < opts.endRange
-        const isDisabled = (opts.minDate && day < opts.minDate) ||
+        const isDisabled =
+          (opts.minDate && day < opts.minDate) ||
           (opts.maxDate && day > opts.maxDate) ||
           (opts.disableWeekends && isWeekend(day)) ||
           (opts.disableDayFn && opts.disableDayFn(day))
