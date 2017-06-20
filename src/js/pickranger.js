@@ -61,6 +61,8 @@
     pickerOptions = extend({}, options, endOptions, {autoInit: false})
     const endPicker = new PlainPicker(pickerOptions)
 
+    console.log(endPicker)
+
     function setStartRange(d, temporary) {
       startPicker.setStartRange(d)
       endPicker.setStartRange(d)
@@ -105,11 +107,7 @@
       endPicker.setEndRange(d)
     }
 
-    console.log(startPicker._onChange)
-    console.log(startPicker.on)
-
     startPicker.on('change', function() {
-      console.log('chcanged')
       delete this.originalRange
       setStartRange(this._d)
       if (!endPicker.isValid()) {

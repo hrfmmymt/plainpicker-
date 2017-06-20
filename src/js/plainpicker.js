@@ -87,23 +87,11 @@
 
   const document = window.document
 
-  const addEvent = function(el, e, callback, capture) {
-    if (hasEventListeners) {
-      el.addEventListener(e, callback, !!capture)
-    } else {
-      el.attachEvent('on' + e, callback)
-    }
-  }
+  const addEvent = (el, e, callback, capture) => el.addEventListener(e, callback, !!capture)
 
-  const removeEvent = function(el, e, callback, capture) {
-    if (hasEventListeners) {
-      el.removeEventListener(e, callback, !!capture)
-    } else {
-      el.detachEvent('on' + e, callback)
-    }
-  }
+  const removeEvent = (el, e, callback, capture) => el.removeEventListener(e, callback, !!capture)
 
-  const fireEvent = function(el, eventName, data) {
+  const fireEvent = (el, eventName, data) => {
     let ev
 
     if (document.createEvent) {
@@ -118,50 +106,36 @@
     }
   }
 
-  const trim = function(str) {
-    return str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, '')
+  const trim = str => (str.trim ? str.trim() : str.replace(/^\s+|\s+$/g, ''))
+
+  const hasClass = (el, cn) => (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
+
+  const addClass = (el, cn) => {
+    if (!hasClass(el, cn)) el.className = el.className === '' ? cn : el.className + ' ' + cn
   }
 
-  const hasClass = function(el, cn) {
-    return (' ' + el.className + ' ').indexOf(' ' + cn + ' ') !== -1
-  }
-
-  const addClass = function(el, cn) {
-    if (!hasClass(el, cn)) {
-      el.className = el.className === '' ? cn : el.className + ' ' + cn
-    }
-  }
-
-  const removeClass = function(el, cn) {
+  const removeClass = (el, cn) => {
     el.className = trim((' ' + el.className + ' ').replace(' ' + cn + ' ', ' '))
   }
 
-  const isArray = function(obj) {
-    return /Array/.test(Object.prototype.toString.call(obj))
-  }
+  const isArray = obj => /Array/.test(Object.prototype.toString.call(obj))
 
-  const isDate = function(obj) {
-    return /Date/.test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
-  }
+  const isDate = obj => /Date/.test(Object.prototype.toString.call(obj)) && !isNaN(obj.getTime())
 
-  const isWeekend = function(date) {
+  const isWeekend = date => {
     const day = date.getDay()
     return day === 0 || day === 6
   }
 
-  const isLeapYear = function(year) {
-    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
-  }
+  const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
 
-  const getDaysInMonth = function(year, month) {
-    return [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
-  }
+  const getDaysInMonth = (year, month) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
 
-  const setToStartOfDay = function(date) {
+  const setToStartOfDay = date => {
     if (isDate(date)) date.setHours(0, 0, 0, 0)
   }
 
-  const areDatesEqual = function(a, b) {
+  const areDatesEqual = (a, b) => {
     if (a === b) {
       return true
     }
@@ -171,14 +145,14 @@
     return a.getTime() === b.getTime()
   }
 
-  const toISODateString = function(date) {
+  const toISODateString = date => {
     const y = date.getFullYear()
     const m = String(date.getMonth() + 1)
     const d = String(date.getDate())
     return y + '/' + (m.length === 1 ? '0' : '') + m + '/' + (d.length === 1 ? '0' : '') + d
   }
 
-  const extend = function(to, from, overwrite) {
+  const extend = (to, from, overwrite) => {
     for (const prop in from) {
       const hasProp = to[prop] !== undefined
       if (hasProp && typeof from[prop] === 'object' && from[prop] !== null && from[prop].nodeName === undefined) {
@@ -200,7 +174,7 @@
     return to
   }
 
-  const adjustCalendar = function(calendar) {
+  const adjustCalendar = calendar => {
     if (calendar.month < 0) {
       calendar.year -= Math.ceil(Math.abs(calendar.month) / 12)
       calendar.month += 12
@@ -212,7 +186,7 @@
     return calendar
   }
 
-  const containsElement = function(container, element) {
+  const containsElement = (container, element) => {
     while (element) {
       if (container === element) {
         return true
@@ -249,13 +223,9 @@
     // the default output format for `.toString()` and `field` value
     // a function(date) { return string }
     // could be date.toLocaleDateString(this._o.i18n.language, {year: 'numeric', month: 'short', day: 'numeric', weekday: 'short'})
-    formatFn: function(date) {
-      return toISODateString(date)
-    },
+    formatFn: date => toISODateString(date),
 
-    parseFn: function(value) {
-      return new Date(Date.parse(value))
-    },
+    parseFn: value => new Date(Date.parse(value)),
 
     // the initial date to view when first opened
     defaultDate: null,
@@ -285,7 +255,7 @@
       return text
     },
 
-    textFn: function(day) {
+    textFn: day => {
       const text = day.day
       return text
     },
@@ -358,7 +328,7 @@
   /**
    * templating functions to abstract HTML rendering
    */
-  const renderDayName = function(opts, day, abbr) {
+  const renderDayName = (opts, day, abbr) => {
     day += opts.firstDay
     while (day >= 7) {
       day -= 7
@@ -366,7 +336,7 @@
     return abbr ? opts.i18n.weekdaysShort[day] : opts.i18n.weekdays[day]
   }
 
-  const renderDay = function(opts) {
+  const renderDay = opts => {
     let arr = []
     let ariaSelected = 'false'
     const ariaLabel = opts.label || ''
@@ -423,21 +393,17 @@
     )
   }
 
-  const renderWeek = function(d, m, y) {
+  const renderWeek = (d, m, y) => {
     const onejan = new Date(y, 0, 1)
     const weekNum = Math.ceil(((new Date(y, m, d) - onejan) / 86400000 + onejan.getDay() + 1) / 7)
     return '<td class="datepicker__week">' + weekNum + '</td>'
   }
 
-  const renderRow = function(days, isRTL) {
-    return '<tr>' + (isRTL ? days.reverse() : days).join('') + '</tr>'
-  }
+  const renderRow = (days, isRTL) => '<tr>' + (isRTL ? days.reverse() : days).join('') + '</tr>'
 
-  const renderBody = function(rows) {
-    return '<tbody>' + rows.join('') + '</tbody>'
-  }
+  const renderBody = rows => '<tbody>' + rows.join('') + '</tbody>'
 
-  const renderHead = function(opts) {
+  const renderHead = opts => {
     let i
     let arr = []
     if (opts.showWeekNumber) {
@@ -449,7 +415,7 @@
     return '<thead aria-hidden="true"><tr>' + (opts.isRTL ? arr.reverse() : arr).join('') + '</tr></thead>'
   }
 
-  const renderTitle = function(instance, c, year, month, refYear, randId) {
+  const renderTitle = (instance, c, year, month, refYear, randId) => {
     let i
     let j
     let arr
@@ -547,7 +513,7 @@
     return html
   }
 
-  const renderTable = function(opts, data, randId) {
+  const renderTable = (opts, data, randId) => {
     return (
       '<table cellpadding="0" cellspacing="0" class="datepicker__table" role="presentation">' +
       renderHead(opts) +
@@ -563,7 +529,7 @@
     const self = this
     const opts = self.config(options)
 
-    self._onClick = function(e) {
+    self._onClick = e => {
       if (!self._v) {
         return
       }
@@ -606,7 +572,8 @@
       }
     }
 
-    self._onChange = function(e) {
+    // SELECT
+    self._onChange = e => {
       e = e || window.event
       const target = e.target || e.srcElement
       if (!target) {
@@ -619,15 +586,15 @@
       }
     }
 
-    self._onKeyChange = function(e) {
+    self._onKeyChange = e => {
       e = e || window.event
 
-      function captureKey() {
+      const captureKey = () => {
         self.hasKey = true
         stopEvent()
       }
 
-      function stopEvent() {
+      const stopEvent = () => {
         e.preventDefault()
         e.stopPropagation()
       }
@@ -695,7 +662,7 @@
       }
     }
 
-    self._onInputChange = function(e) {
+    self._onInputChange = e => {
       if (e.firedBy === self) {
         return
       }
@@ -709,13 +676,13 @@
       }
     }
 
-    self._onTouch = function(event) {
-      if (!self.isVisible() || event.target !== opts.field) {
+    self._onTouch = e => {
+      if (!self.isVisible() || e.target !== opts.field) {
         self.touched = true
       }
     }
 
-    self._onInputFocus = function(event) {
+    self._onInputFocus = () => {
       if (self.touched && opts.field && opts.field.nodeName === 'INPUT') {
         opts.field.blur()
         self.touched = false
@@ -724,12 +691,12 @@
       self.show()
     }
 
-    self._onInputClick = function(event) {
+    self._onInputClick = () => {
       self.touched = false
       self.show()
     }
 
-    self._onInputBlur = function(event) {
+    self._onInputBlur = () => {
       if (self.hasKey) {
         return
       }
@@ -748,7 +715,7 @@
       self._c = false
     }
 
-    self._onDocumentClick = function(e) {
+    self._onDocumentClick = e => {
       e = e || window.event
       const target = e.target || e.srcElement
       let pEl = target
@@ -910,19 +877,17 @@
         }
       }
 
-      // const eventTest = /^on([A-Z]\w+)$/
-      // Object.keys(opts).forEach(
-      //   function(key) {
-      //     const match = key.match(eventTest)
-      //     console.log(eventTest)
-      //     if (match) {
-      //       const type = match[1].toLowerCase()
-      //       console.log(type)
-      //       this.on(type, opts[key])
-      //       delete opts[key]
-      //     }
-      //   }.bind(this)
-      // )
+      const eventTest = /^on([A-Z]\w+)$/
+      Object.keys(opts).forEach(
+        function(key) {
+          const match = key.match(eventTest)
+          if (match) {
+            const type = match[1].toLowerCase()
+            this.on(type, opts[key])
+            delete opts[key]
+          }
+        }.bind(this)
+      )
 
       return opts
     },
@@ -1245,7 +1210,6 @@
         return
       }
       const opts = this._o
-      // var self = this
       const minYear = opts.minYear
       const maxYear = opts.maxYear
       const minMonth = opts.minMonth
