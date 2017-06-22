@@ -30,6 +30,31 @@
     return day === 0 || day === 6
   }
 
+  const prevAll = element => {
+    let result = []
+    while ((element = element.previousElementSibling) !== null) result.push(element)
+    return result
+  }
+
+  const getParents = (el, parentSelector) => {
+    if (parentSelector === undefined) {
+      parentSelector = document
+    }
+
+    let parents = []
+    let p = el.parentNode
+
+    while (p !== parentSelector) {
+      let o = p
+      parents.push(o)
+      p = o.parentNode
+    }
+
+    parents.push(parentSelector)
+
+    return parents
+  }
+
   const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
 
   const getDaysInMonth = (year, month) => [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month]
@@ -416,11 +441,8 @@
                 }
                 self.dateRangeArr.push(selectedDate)
 
-                // console.log(self.dateRangeArr)
-
                 self.dateRangeArr.forEach(function (e) {
                   self.setDate(e)
-                  // console.log(e)
                 })
 
                 if (self.dateRangeArr.length > 1) {
@@ -466,13 +488,64 @@
     self._onMouseOver = e => {
       e = e || window.event
       const target = e.target || e.srcElement
-      if (!target) return
+
+      if (!target || !opts.rangeSelect) return
+
       if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
-        // if (opts.bound) {
-        setTimeout(() => {
-          addClass(target.parentNode, 'datepicker__highlighted')
-        }, 200)
-        // }
+        addClass(target.parentNode.parentNode, 'hoveredWeek')
+
+        Array.prototype.forEach.call(document.getElementsByClassName('hoveredWeek'), function (node) {
+          let parent = node.parentNode.parentNode.parentNode.parentNode.querySelectorAll('.datepicker__lendar')
+
+          console.log(parent)
+          console.log(getParents(target))
+
+          let tableOfLast = parent[parent.length - 1]
+          let TRF = tableOfLast.parentNode.querySelector('.datepicker__lendar').querySelectorAll('tr')
+          let TRFOfLast = TRF[TRF.length - 1]
+          addClass(TRFOfLast, 'hoveredOtherTable')
+
+          Array.prototype.forEach.call(prevAll(node), function (prevAllTr) {
+            Array.prototype.forEach.call(prevAllTr.querySelectorAll('td:not(is-disabled)'), function (tds) {
+              addClass(tds, 'in-range')
+            })
+          })
+        })
+
+        Array.prototype.forEach.call(document.getElementsByClassName('hoveredOtherTable'), function (node) {
+          let enableTd = node.querySelectorAll('td:not(.is-disabled)')
+          Array.prototype.forEach.call(enableTd, function (node) {
+            addClass(node, 'in-range')
+          })
+
+          Array.prototype.forEach.call(prevAll(node), function (prevTr) {
+            Array.prototype.forEach.call(prevTr.querySelectorAll('td:not(.is-disabled)'), function (tds) {
+              addClass(tds, 'in-range')
+            })
+          })
+        })
+
+        Array.prototype.forEach.call(prevAll(target), function (prevTr) {
+          Array.prototype.forEach.call(prevTr.querySelectorAll('td:not(.is-disabled)'), function (tds) {
+            addClass(tds, 'in-range')
+          })
+        })
+      }
+    }
+
+    self._onMouseLeave = e => {
+      e = e || window.event
+      const target = e.target || e.srcElement
+      if (!target || !opts.rangeSelect) return
+
+      if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
+        removeClass(target.parentNode.parentNode, 'hoveredWeek')
+        removeClass(target.parentNode, 'in-range')
+        Array.prototype.forEach.call(document.getElementsByClassName('hoveredOtherTable'), function (node) {
+          removeClass(node, 'hoveredOtherTable')
+          // console.log(node.querySelectorAll('.in-range'))
+        })
+        // $('.hoverdOtherTable').removeClass('hoverdOtherTable').find('.in-range').removeClass('in-range');
       }
     }
 
@@ -575,6 +648,7 @@
 
     addEvent(self.el, 'mousedown', self._onMouseDown, true)
     addEvent(self.el, 'mouseover', self._onMouseOver, true)
+    addEvent(self.el, 'mouseleave', self._onMouseLeave, true)
     addEvent(self.el, 'touchend', self._onMouseDown, true)
     addEvent(self.el, 'change', self._onChange)
     addEvent(document, 'keydown', self._onKeyChange)

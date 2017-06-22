@@ -158,6 +158,10 @@
     border-color: #5498fb;
   }
 
+  .datepicker td.in-range button {
+      color: #f00;
+    }
+
   .datepicker__week {
     font-size: 11px;
     color: #aaa;

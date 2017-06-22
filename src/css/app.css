@@ -154,6 +154,12 @@
     border-color: #5498fb;
   }
 
+  & td.in-range {
+    & button {
+      color: #f00;
+    }
+  }
+
   &__week {
     font-size: 11px;
     color: #aaa;
