@@ -122,7 +122,6 @@
     display: block;
     box-sizing: border-box;
     outline: none;
-    border: 0;
     margin: 0;
     width: 100%;
     padding: 14px;
@@ -131,6 +130,7 @@
     line-height: 15px;
     text-align: right;
     background: transparent;
+    border: 1px solid transparent;
 
     &:hover {
       background-color: #ebebeb;
@@ -138,7 +138,7 @@
   }
 
   & td {
-    border: 1px solid transparent;
+    /* border: 1px solid transparent; */
     text-align: center;
   }
 
@@ -151,12 +151,16 @@
 
   & td.is-selected {
     box-sizing: border-box;
-    border-color: #5498fb;
+
+    /* border-color: #5498fb; */
+    & button {
+      border: 1px solid #5498fb;
+    }
   }
 
   & td.in-range {
     & button {
-      color: #f00;
+      background-color: #ebebeb;
     }
   }
 

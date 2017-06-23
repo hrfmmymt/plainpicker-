@@ -36,23 +36,16 @@
     return result
   }
 
-  const getParents = (el, parentSelector) => {
-    if (parentSelector === undefined) {
-      parentSelector = document
+  const getClosest = (el, selector) => {
+    const matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector
+
+    while (el) {
+      if (matchesSelector.call(el, selector)) {
+        break
+      }
+      el = el.parentElement
     }
-
-    let parents = []
-    let p = el.parentNode
-
-    while (p !== parentSelector) {
-      let o = p
-      parents.push(o)
-      p = o.parentNode
-    }
-
-    parents.push(parentSelector)
-
-    return parents
+    return el
   }
 
   const isLeapYear = year => (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0
@@ -446,7 +439,7 @@
                 })
 
                 if (self.dateRangeArr.length > 1) {
-                  // self.hide()
+                  self.hide()
                   self.setMinDate(defOptsMinDate)
                 }
                 if (opts.blurFieldOnSelect && opts.field) {
@@ -492,43 +485,46 @@
       if (!target || !opts.rangeSelect) return
 
       if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
-        addClass(target.parentNode.parentNode, 'hoveredWeek')
+        let targetParentsTr = getClosest(target, 'tr')
+        addClass(targetParentsTr, 'hoveredWeek')
 
-        Array.prototype.forEach.call(document.getElementsByClassName('hoveredWeek'), function (node) {
-          let parent = node.parentNode.parentNode.parentNode.parentNode.querySelectorAll('.datepicker__lendar')
+        let lastTargetPicker = getClosest(targetParentsTr, '.datepicker__lendar__last')
+        let parentDatePicker
 
-          console.log(parent)
-          console.log(getParents(target))
+        if (lastTargetPicker !== null) {
+          parentDatePicker = lastTargetPicker.parentNode
+          let tableOfFirst = parentDatePicker.children[0]
+          let trsOfFirstTable = tableOfFirst.getElementsByTagName('tr')
+          let lastTrOfFirstTable = trsOfFirstTable[trsOfFirstTable.length - 1]
+          addClass(lastTrOfFirstTable, 'hoveredOtherTable')
+        }
 
-          let tableOfLast = parent[parent.length - 1]
-          let TRF = tableOfLast.parentNode.querySelector('.datepicker__lendar').querySelectorAll('tr')
-          let TRFOfLast = TRF[TRF.length - 1]
-          addClass(TRFOfLast, 'hoveredOtherTable')
+        let hoveredOtherTable = document.getElementsByClassName('hoveredOtherTable')
 
-          Array.prototype.forEach.call(prevAll(node), function (prevAllTr) {
-            Array.prototype.forEach.call(prevAllTr.querySelectorAll('td:not(is-disabled)'), function (tds) {
-              addClass(tds, 'in-range')
+        Array.prototype.forEach.call(hoveredOtherTable, function (node) {
+          let inRange = node.querySelectorAll('td:not(.is-disabled)')
+
+          Array.prototype.forEach.call(inRange, function (nodeChildren) {
+            addClass(nodeChildren, 'in-range')
+          })
+
+          Array.prototype.forEach.call(prevAll(node), function (nodeChildren) {
+            let tdsPrevLastWeek = nodeChildren.querySelectorAll('td:not(.is-disabled)')
+            Array.prototype.forEach.call(tdsPrevLastWeek, function (el) {
+              addClass(el, 'in-range')
             })
           })
         })
 
-        Array.prototype.forEach.call(document.getElementsByClassName('hoveredOtherTable'), function (node) {
-          let enableTd = node.querySelectorAll('td:not(.is-disabled)')
-          Array.prototype.forEach.call(enableTd, function (node) {
-            addClass(node, 'in-range')
-          })
-
-          Array.prototype.forEach.call(prevAll(node), function (prevTr) {
-            Array.prototype.forEach.call(prevTr.querySelectorAll('td:not(.is-disabled)'), function (tds) {
-              addClass(tds, 'in-range')
-            })
+        Array.prototype.forEach.call(prevAll(targetParentsTr), function (node) {
+          let inRange = node.querySelectorAll('td:not(.is-disabled)')
+          Array.prototype.forEach.call(inRange, function (nodeChildren) {
+            addClass(nodeChildren, 'in-range')
           })
         })
 
-        Array.prototype.forEach.call(prevAll(target), function (prevTr) {
-          Array.prototype.forEach.call(prevTr.querySelectorAll('td:not(.is-disabled)'), function (tds) {
-            addClass(tds, 'in-range')
-          })
+        Array.prototype.forEach.call(prevAll(target.parentNode), function (node) {
+          if (!hasClass(node, 'is-disabled')) addClass(node, 'in-range')
         })
       }
     }
@@ -539,13 +535,17 @@
       if (!target || !opts.rangeSelect) return
 
       if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
-        removeClass(target.parentNode.parentNode, 'hoveredWeek')
-        removeClass(target.parentNode, 'in-range')
+        let targetParentsTr = getClosest(target, 'tr')
+        removeClass(targetParentsTr, 'hoveredWeek')
+
+        let parentDatePicker = getClosest(target, '.datepicker')
+        Array.prototype.forEach.call(parentDatePicker.getElementsByTagName('td'), function (node) {
+          removeClass(node, 'in-range')
+        })
+
         Array.prototype.forEach.call(document.getElementsByClassName('hoveredOtherTable'), function (node) {
           removeClass(node, 'hoveredOtherTable')
-          // console.log(node.querySelectorAll('.in-range'))
         })
-        // $('.hoverdOtherTable').removeClass('hoverdOtherTable').find('.in-range').removeClass('in-range');
       }
     }
 
@@ -623,7 +623,7 @@
 
       if (!self._c) {
         self._b = setTimeout(() => {
-          // self.hide()
+          self.hide()
         }, 50)
       }
       self._c = false
@@ -746,23 +746,6 @@
     },
 
     /**
-     * return a formatted string of the current selection (using Moment.js if available)
-     */
-    // toString: function (format) {
-    //   format = format || this._o.format
-    //   if (!isDate(this._d)) {
-    //     return ''
-    //   }
-
-    //   if (this._o.toString) {
-    //     console.log(this._o)
-    //     return this._o.toString(this._d, format)
-    //   }
-
-    //   return this._d.toDateString()
-    // },
-
-    /**
      * return a Date object of the current selection
      */
     getDate: function () {
@@ -814,7 +797,6 @@
         let yyyymmdd = yyyy + '/' + mm + '/' + dd
         superArr.push(yyyymmdd)
       })
-      console.log(superArr)
 
       if (self._o.field) {
         if (self._o.rangeSelect) {
@@ -1004,12 +986,21 @@
 
       randId = 'datepicker__title-' + Math.random().toString(36).replace(/[^a-z]+/g, '').substr(0, 2)
 
-      let c
+      let c, positionStr
       for (c = 0; c < opts.numberOfMonths; c++) {
+        if (c === 0) {
+          positionStr = ' datepicker__lendar__first'
+        } else if (c === opts.numberOfMonths - 1) {
+          positionStr = ' datepicker__lendar__last'
+        } else {
+          positionStr = ''
+        }
+        if (opts.numberOfMonths === 1) positionStr = ''
+
         html +=
-          '<div class="datepicker__lendar">' +
-          renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) +
-          this.render(this.calendars[c].year, this.calendars[c].month, randId) +
+          '<div class="datepicker__lendar' + positionStr + '">' +
+            renderTitle(this, c, this.calendars[c].year, this.calendars[c].month, this.calendars[0].year, randId) +
+            this.render(this.calendars[c].year, this.calendars[c].month, randId) +
           '</div>'
       }
 
