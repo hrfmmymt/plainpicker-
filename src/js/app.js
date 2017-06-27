@@ -424,6 +424,8 @@
                   target.getAttribute('data-datepicker-day')
                 )
 
+                console.log(selectedDate)
+
                 addClass(target, 'datepicker__button--started')
 
                 self.setMinDate(selectedDate)
@@ -565,25 +567,83 @@
     self._onKeyChange = e => {
       e = e || window.event
 
+      const captureKey = () => {
+        self.hasKey = true
+        stopEvent()
+      }
+
+      const stopEvent = () => {
+        e.preventDefault()
+        e.stopPropagation()
+      }
+
       if (self.isVisible()) {
         switch (e.keyCode) {
-          case 13:
-          case 27:
-            if (opts.field) {
-              opts.field.blur()
+          case 9: // tab
+            if (self.hasKey && self._o.trigger) {
+              self._o.trigger.focus()
+              self.hasKey = false
             }
             break
-          case 37:
-            e.preventDefault()
+          case 32: // space
+          case 13: // enter
+            if (opts.rangeSelect) { // selectable date range on single calendar
+              let selectedDate = self._d
+
+              // addClass(target, 'datepicker__button--started')
+
+              self.setMinDate(selectedDate)
+
+              // 選択可能は二つまで。とりあえず
+              if (self.dateRangeArr.length > 1) {
+                self.dateRangeArr = []
+              }
+              self.dateRangeArr.push(selectedDate)
+
+              self.dateRangeArr.forEach(function (e) {
+                self.setDate(e)
+              })
+
+              if (self.dateRangeArr.length > 1) {
+                self.hide()
+                self.setMinDate(defOptsMinDate)
+              }
+              if (opts.blurFieldOnSelect && opts.field) {
+                opts.field.blur()
+              }
+            } else {
+              if (self.hasKey && !opts.container) {
+                stopEvent()
+                if (self._o.trigger) {
+                  self._o.trigger.focus()
+                  try { self._o.trigger.select() } catch (e) {} // trigger could be a button
+                }
+                console.log('Hiding because enter or space pressed')
+                self.hide()
+              }
+            }
+            break
+          case 27: // esc
+            if (!opts.container) {
+              stopEvent()
+              console.log('Cancel because escape pressed')
+              self.cancel()
+            }
+            break
+          case 37: // ←
+            captureKey()
             self.adjustDate('subtract', 1)
             break
-          case 38:
+          case 38: // ↑
+            captureKey()
             self.adjustDate('subtract', 7)
             break
-          case 39:
+          case 39: // →
+            captureKey()
             self.adjustDate('add', 1)
             break
-          case 40:
+          case 40: // ↓
+            captureKey()
             self.adjustDate('add', 7)
             break
         }
@@ -788,25 +848,29 @@
       setToStartOfDay(self._d)
       self.gotoDate(self._d)
 
-      let superArr = []
-
-      self.dateRangeArr.forEach(function (e) {
-        let yyyy = e.getFullYear()
-        let mm = zeroPadding(e.getMonth() + 1)
-        let dd = zeroPadding(e.getDate())
-        let yyyymmdd = yyyy + '/' + mm + '/' + dd
-        superArr.push(yyyymmdd)
-      })
-
       if (self._o.field) {
         if (self._o.rangeSelect) {
+          let superArr = []
+
+          self.dateRangeArr.forEach(function (e) {
+            let yyyy = e.getFullYear()
+            let mm = zeroPadding(e.getMonth() + 1)
+            let dd = zeroPadding(e.getDate())
+            let yyyymmdd = yyyy + '/' + mm + '/' + dd
+            superArr.push(yyyymmdd)
+          })
+
           self._o.field.value = superArr.join(' - ')
         } else {
-          self._o.field.value = self.toString()
-          fireEvent(self._o.field, 'change', {
-            firedBy: self
-          })
+          let yyyy = self._d.getFullYear()
+          let mm = zeroPadding(self._d.getMonth() + 1)
+          let dd = zeroPadding(self._d.getDate())
+          let yyyymmdd = yyyy + '/' + mm + '/' + dd
+          self._o.field.value = yyyymmdd
         }
+        fireEvent(self._o.field, 'change', {
+          firedBy: self
+        })
       }
 
       if (!preventOnSelect && typeof self._o.onSelect === 'function') {
