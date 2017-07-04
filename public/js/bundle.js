@@ -506,6 +506,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     self._onMouseLeave = function (e) {
       e = e || window.event;
       var target = e.target || e.srcElement;
+
       if (!target || !opts.rangeSelect) return;
 
       if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
@@ -527,6 +528,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     self._onChange = function (e) {
       e = e || window.event;
       var target = e.target || e.srcElement;
+
       if (!target) return;
 
       if (hasClass(target, 'datepicker__select-month')) {
@@ -561,11 +563,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           case 32: // space
           case 13:
             // enter
+
+            // 矢印で選択候補を上書きし続けて setDate で表示
+            // Enter で候補を Array に push
+
             if (opts.rangeSelect) {
               // selectable date range on single calendar
               var selectedDate = self._d;
-
-              // addClass(target, 'datepicker__button--started')
 
               self.setMinDate(selectedDate
 
@@ -612,21 +616,29 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // ←
             captureKey();
             self.adjustDate('subtract', 1);
+
+            console.log(self._d);
             break;
           case 38:
             // ↑
             captureKey();
             self.adjustDate('subtract', 7);
+
+            console.log(self._d);
             break;
           case 39:
             // →
             captureKey();
             self.adjustDate('add', 1);
+
+            console.log(self._d);
             break;
           case 40:
             // ↓
             captureKey();
             self.adjustDate('add', 7);
+
+            console.log(self._d);
             break;
         }
       }

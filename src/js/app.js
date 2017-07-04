@@ -534,6 +534,7 @@
     self._onMouseLeave = e => {
       e = e || window.event
       const target = e.target || e.srcElement
+
       if (!target || !opts.rangeSelect) return
 
       if (hasClass(target, 'datepicker__button') && !hasClass(target, 'is-empty') && !hasClass(target.parentNode, 'is-disabled') && self.dateRangeArr.length > 0) {
@@ -555,6 +556,7 @@
     self._onChange = e => {
       e = e || window.event
       const target = e.target || e.srcElement
+
       if (!target) return
 
       if (hasClass(target, 'datepicker__select-month')) {
@@ -587,10 +589,12 @@
             break
           case 32: // space
           case 13: // enter
+
+            // 矢印で選択候補を上書きし続けて setDate で表示
+            // Enter で候補を Array に push
+
             if (opts.rangeSelect) { // selectable date range on single calendar
               let selectedDate = self._d
-
-              // addClass(target, 'datepicker__button--started')
 
               self.setMinDate(selectedDate)
 
@@ -616,7 +620,9 @@
                 stopEvent()
                 if (self._o.trigger) {
                   self._o.trigger.focus()
-                  try { self._o.trigger.select() } catch (e) {} // trigger could be a button
+                  try {
+                    self._o.trigger.select()
+                  } catch (e) {} // trigger could be a button
                 }
                 console.log('Hiding because enter or space pressed')
                 self.hide()
@@ -633,18 +639,26 @@
           case 37: // ←
             captureKey()
             self.adjustDate('subtract', 1)
+
+            console.log(self._d)
             break
           case 38: // ↑
             captureKey()
             self.adjustDate('subtract', 7)
+
+            console.log(self._d)
             break
           case 39: // →
             captureKey()
             self.adjustDate('add', 1)
+
+            console.log(self._d)
             break
           case 40: // ↓
             captureKey()
             self.adjustDate('add', 7)
+
+            console.log(self._d)
             break
         }
       }
