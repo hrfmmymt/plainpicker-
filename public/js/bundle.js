@@ -154,13 +154,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     // automatically fit in the viewport even if it means repositioning from the position option
     reposition: true,
 
-    // the default output format for `.toString()` and `field` value
-    // format: 'YYYY-MM-DD',
-
-    // the toString function which gets passed a current date object and format
-    // and returns a string
-    // toString: null,
-
     // used to create date object from current input string
     parse: null,
 
@@ -402,13 +395,11 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                 // selectable date range on single calendar
                 var selectedDate = new Date(target.getAttribute('data-datepicker-year'), target.getAttribute('data-datepicker-month'), target.getAttribute('data-datepicker-day'));
 
-                console.log(selectedDate);
-
                 addClass(target, 'datepicker__button--started');
 
                 self.setMinDate(selectedDate
 
-                // 選択可能は二つまで。とりあえず
+                // Up to two selectable
                 );if (self.dateRangeArr.length > 1) {
                   self.dateRangeArr = [];
                 }
@@ -564,16 +555,13 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
           case 13:
             // enter
 
-            // 矢印で選択候補を上書きし続けて setDate で表示
-            // Enter で候補を Array に push
-
             if (opts.rangeSelect) {
               // selectable date range on single calendar
               var selectedDate = self._d;
 
               self.setMinDate(selectedDate
 
-              // 選択可能は二つまで。とりあえず
+              // Up to two selectable
               );if (self.dateRangeArr.length > 1) {
                 self.dateRangeArr = [];
               }
@@ -599,7 +587,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
                     self._o.trigger.select();
                   } catch (e) {} // trigger could be a button
                 }
-                console.log('Hiding because enter or space pressed');
                 self.hide();
               }
             }
@@ -608,7 +595,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // esc
             if (!opts.container) {
               stopEvent();
-              console.log('Cancel because escape pressed');
               self.cancel();
             }
             break;
@@ -616,29 +602,21 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
             // ←
             captureKey();
             self.adjustDate('subtract', 1);
-
-            console.log(self._d);
             break;
           case 38:
             // ↑
             captureKey();
             self.adjustDate('subtract', 7);
-
-            console.log(self._d);
             break;
           case 39:
             // →
             captureKey();
             self.adjustDate('add', 1);
-
-            console.log(self._d);
             break;
           case 40:
             // ↓
             captureKey();
             self.adjustDate('add', 7);
-
-            console.log(self._d);
             break;
         }
       }
@@ -956,7 +934,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
     },
 
     /**
-     * change view to a specific full year (e.g. "2012")
+     * change view to a specific full year ("yyyy")
      */
     gotoYear: function gotoYear(year) {
       if (!isNaN(year)) {
@@ -1072,7 +1050,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
       }
 
       if (opts.bound) {
-        // let the screen reader user know to use arrow keys
         opts.field.setAttribute('aria-label', 'Use the arrow keys to pick a date');
       }
     },
